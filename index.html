@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>League of Friendship — Where Every Sunday Opens a New World</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-card: #16161f;
+    --bg-accent: #1a1a2e;
+    --text-primary: #e8e6e3;
+    --text-secondary: #9a9a9a;
+    --text-muted: #5a5a6a;
+    --accent-gold: #c9a84c;
+    --accent-gold-dim: #8a7235;
+    --accent-portal: #6366f1;
+    --accent-portal-glow: #818cf8;
+    --accent-green: #22c55e;
+    --accent-red: #ef4444;
+    --border: #1e1e2e;
+    --border-light: #2a2a3a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* === COSMIC BACKGROUND === */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(201, 168, 76, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* === TOP BAR === */
+  .top-bar {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    position: relative;
+    z-index: 10;
+  }
+  .top-bar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .top-bar a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .top-bar a:hover { color: var(--accent-gold); }
+  .top-bar .ticker {
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+  }
+
+  /* === HEADER === */
+  header {
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 24px 20px;
+    text-align: center;
+  }
+  .site-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 900;
+    font-size: 2.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--accent-gold), #e8d5a3, var(--accent-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+  .site-tagline {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+  }
+  .portal-icon {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--accent-portal);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--accent-portal-glow), 0 0 4px var(--accent-portal);
+    margin: 0 8px;
+    vertical-align: middle;
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 12px var(--accent-portal-glow), 0 0 4px var(--accent-portal); }
+    50% { box-shadow: 0 0 20px var(--accent-portal-glow), 0 0 8px var(--accent-portal); }
+  }
+
+  /* === NAV === */
+  nav {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 0;
+  }
+  .nav-inner a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 14px 20px;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+  }
+  .nav-inner a:hover {
+    color: var(--text-primary);
+    border-bottom-color: var(--accent-gold);
+  }
+  .nav-inner a.active {
+    color: var(--accent-gold);
+    border-bottom-color: var(--accent-gold);
+  }
+
+  /* === MAIN LAYOUT === */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 40px;
+  }
+
+  /* === FEATURED ARTICLE === */
+  .featured {
+    margin-bottom: 40px;
+  }
+  .featured-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent-portal-glow);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .featured-label::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 1px;
+    background: var(--accent-portal);
+  }
+  .featured h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .featured h2 a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .featured h2 a:hover { color: var(--accent-gold); }
+  .featured .excerpt {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 16px;
+    max-width: 640px;
+  }
+  .byline {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .byline strong {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  .byline .divider {
+    margin: 0 8px;
+    color: var(--border-light);
+  }
+
+  /* === ARTICLE CARDS === */
+  .section-header {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--accent-gold);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .section-header .see-all {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .section-header .see-all:hover { color: var(--accent-gold); }
+
+  .article-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .article-card {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .article-card:last-child { border-bottom: none; }
+  .article-card .category {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent-gold);
+    margin-bottom: 6px;
+  }
+  .article-card h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  .article-card h3 a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .article-card h3 a:hover { color: var(--accent-gold); }
+  .article-card .preview {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  /* === SIDEBAR === */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  /* === FAAB MONEYLINES === */
+  .moneylines-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .moneylines-header {
+    background: linear-gradient(135deg, var(--bg-accent), #1e1e35);
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .moneylines-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .moneylines-week {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent-portal-glow);
+    background: rgba(99, 102, 241, 0.15);
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+  .matchup {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+  .matchup:last-child { border-bottom: none; }
+  .matchup:hover { background: var(--bg-accent); }
+  .matchup-teams {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .matchup-team {
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .matchup-vs {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .matchup-odds {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .odds-btn {
+    flex: 1;
+    background: var(--bg-accent);
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    padding: 8px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .odds-btn:hover {
+    border-color: var(--accent-gold);
+    background: rgba(201, 168, 76, 0.08);
+  }
+  .odds-btn .team-short {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 2px;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .odds-btn .line {
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  .odds-btn .line.fav { color: var(--accent-green); }
+  .odds-btn .line.dog { color: var(--accent-red); }
+
+  .faab-pool {
+    padding: 12px 20px;
+    background: rgba(201, 168, 76, 0.06);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+  }
+  .faab-pool .label { color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+  .faab-pool .amount {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent-gold);
+    font-weight: 500;
+  }
+
+  /* === STANDINGS CARD === */
+  .standings-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .standings-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .standings-header h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .standings-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+    transition: background 0.15s;
+  }
+  .standings-row:hover { background: var(--bg-accent); }
+  .standings-row:last-child { border-bottom: none; }
+  .standings-rank {
+    width: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+  .standings-name {
+    flex: 1;
+    font-weight: 500;
+  }
+  .standings-record {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+  }
+  .standings-faab {
+    width: 60px;
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent-gold-dim);
+    font-size: 0.78rem;
+  }
+
+  /* === LORE SIDEBAR CARD === */
+  .lore-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .lore-card h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .lore-card p {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    font-style: italic;
+  }
+  .lore-card .source {
+    margin-top: 12px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-style: normal;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* === FOOTER === */
+  footer {
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+    padding: 32px 24px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .footer-brand {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--accent-gold-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .footer-text {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .footer-links {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+  }
+  .footer-links a {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--accent-gold); }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 900px) {
+    .main-grid {
+      grid-template-columns: 1fr;
+    }
+    .site-title { font-size: 2rem; }
+    .featured h2 { font-size: 1.6rem; }
+    .nav-inner { overflow-x: auto; }
+    .nav-inner a { white-space: nowrap; padding: 12px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <span>Dynasty / Superflex / 16 Teams / Sleeper</span>
+    <span class="ticker">SEASON 1 — THE INAUGURAL CAMPAIGN</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="site-title">League of Friendship</div>
+    <div class="site-tagline"><span class="portal-icon"></span> Where Every Sunday Opens a New World <span class="portal-icon"></span></div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="active">Home</a>
+    <a href="#">Articles</a>
+    <a href="#">Moneylines</a>
+    <a href="#">Power Rankings</a>
+    <a href="#">Teams</a>
+    <a href="#">The Multiverse</a>
+    <a href="#">League Lore</a>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+  <div class="main-grid">
+
+    <!-- LEFT COLUMN -->
+    <main>
+      <!-- FEATURED -->
+      <article class="featured">
+        <div class="featured-label">Dispatch from the Portal</div>
+        <h2><a href="#">Sixteen Owners Walked Into a Room. Only One Universe Walked Out.</a></h2>
+        <p class="excerpt">
+          The inaugural auction of the League of Friendship wasn't just a draft — it was a creation myth. Sixteen friends gathered, FAAB dollars in hand, and bid the multiverse into existence. Who spent recklessly? Who played the long game? And whose roster already looks like it was forged in another dimension?
+        </p>
+        <div class="byline">
+          <strong>Claude</strong>, Senior Staff Writer
+          <span class="divider">|</span>
+          March 15, 2026
+          <span class="divider">|</span>
+          12 min read
+        </div>
+      </article>
+
+      <!-- RECENT ARTICLES -->
+      <div class="section-header">
+        <span>Latest from the Press Box</span>
+        <a href="#" class="see-all">See All &rarr;</a>
+      </div>
+
+      <div class="article-stack">
+        <article class="article-card">
+          <div class="category">Auction Recap</div>
+          <h3><a href="#">The $47 Man: Inside the Most Polarizing Bid of Draft Night</a></h3>
+          <p class="preview">
+            One owner went all-in on a single player. The room erupted. Our insider breaks down the math, the madness, and what it means for the balance of power in Year One.
+          </p>
+          <div class="byline">
+            <strong>Claude</strong><span class="divider">|</span>Coming Soon
+          </div>
+        </article>
+
+        <article class="article-card">
+          <div class="category">Multiverse Lore</div>
+          <h3><a href="#">The Cartography of Friendship: Mapping the Sixteen Realms</a></h3>
+          <p class="preview">
+            Every team exists somewhere in the multiverse. This is the first attempt to chart the territories — from the neon-lit trading floors to the ancient keeps where dynasty rosters are etched in stone.
+          </p>
+          <div class="byline">
+            <strong>Claude</strong><span class="divider">|</span>Coming Soon
+          </div>
+        </article>
+
+        <article class="article-card">
+          <div class="category">Power Rankings</div>
+          <h3><a href="#">Preseason Power Rankings: Rating Every Roster After the Auction</a></h3>
+          <p class="preview">
+            The dust has settled. The rosters are locked. It's time to stack-rank every team in the league based on what we saw on draft night — and what our sources are whispering about what comes next.
+          </p>
+          <div class="byline">
+            <strong>Claude</strong><span class="divider">|</span>Coming Soon
+          </div>
+        </article>
+
+        <article class="article-card">
+          <div class="category">The Commissioner's Desk</div>
+          <h3><a href="#">Why This League Exists: A Letter from the Commissioner</a></h3>
+          <p class="preview">
+            Commissioner Paul opens up about the vision behind the League of Friendship — why dynasty fantasy football is the perfect vehicle for staying connected, and what he hopes this league becomes.
+          </p>
+          <div class="byline">
+            <strong>Paul</strong>, Commissioner<span class="divider">|</span>Coming Soon
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- FAAB MONEYLINES -->
+      <div class="moneylines-card">
+        <div class="moneylines-header">
+          <span class="moneylines-title">FAAB Moneylines</span>
+          <span class="moneylines-week">WEEK 1</span>
+        </div>
+
+        <div class="matchup">
+          <div class="matchup-teams">
+            <span class="matchup-team">The Architects</span>
+            <span class="matchup-vs">vs</span>
+            <span class="matchup-team">Void Walkers</span>
+          </div>
+          <div class="matchup-odds">
+            <div class="odds-btn">
+              <span class="team-short">ARC</span>
+              <span class="line fav">-145</span>
+            </div>
+            <div class="odds-btn">
+              <span class="team-short">VOID</span>
+              <span class="line dog">+125</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="matchup">
+          <div class="matchup-teams">
+            <span class="matchup-team">Iron Council</span>
+            <span class="matchup-vs">vs</span>
+            <span class="matchup-team">Neon Prophets</span>
+          </div>
+          <div class="matchup-odds">
+            <div class="odds-btn">
+              <span class="team-short">IRON</span>
+              <span class="line dog">+110</span>
+            </div>
+            <div class="odds-btn">
+              <span class="team-short">NEON</span>
+              <span class="line fav">-130</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="matchup">
+          <div class="matchup-teams">
+            <span class="matchup-team">Twilight Syndicate</span>
+            <span class="matchup-vs">vs</span>
+            <span class="matchup-team">Dawn Brigade</span>
+          </div>
+          <div class="matchup-odds">
+            <div class="odds-btn">
+              <span class="team-short">TWI</span>
+              <span class="line fav">-160</span>
+            </div>
+            <div class="odds-btn">
+              <span class="team-short">DAWN</span>
+              <span class="line dog">+140</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="faab-pool">
+          <span class="label">Total FAAB in Play</span>
+          <span class="amount">$2,847</span>
+        </div>
+      </div>
+
+      <!-- FAAB LEADERBOARD -->
+      <div class="standings-card">
+        <div class="standings-header">
+          <h3>FAAB Leaderboard</h3>
+        </div>
+        <div class="standings-row">
+          <span class="standings-rank">1</span>
+          <span class="standings-name">The Architects</span>
+          <span class="standings-faab">$1,000</span>
+        </div>
+        <div class="standings-row">
+          <span class="standings-rank">2</span>
+          <span class="standings-name">Void Walkers</span>
+          <span class="standings-faab">$1,000</span>
+        </div>
+        <div class="standings-row">
+          <span class="standings-rank">3</span>
+          <span class="standings-name">Iron Council</span>
+          <span class="standings-faab">$1,000</span>
+        </div>
+        <div class="standings-row">
+          <span class="standings-rank">4</span>
+          <span class="standings-name">Neon Prophets</span>
+          <span class="standings-faab">$1,000</span>
+        </div>
+        <div class="standings-row">
+          <span class="standings-rank">5</span>
+          <span class="standings-name">Twilight Syndicate</span>
+          <span class="standings-faab">$1,000</span>
+        </div>
+      </div>
+
+      <!-- LORE FRAGMENT -->
+      <div class="lore-card">
+        <h3>From the Archives</h3>
+        <p>
+          "They say the first auction is always the loudest — not because of the bidding, but because it's the sound of a universe waking up. Every dollar spent is a thread pulled from one reality and woven into another."
+        </p>
+        <div class="source">The Archivist — Multiverse Fragment #001</div>
+      </div>
+
+    </aside>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">League of Friendship</div>
+    <div class="footer-text">
+      A dynasty fantasy football league and its universe.<br>
+      Established 2026. Sixteen owners. Infinite timelines.
+    </div>
+    <div class="footer-links">
+      <a href="#">About</a>
+      <a href="#">Constitution</a>
+      <a href="#">The Multiverse</a>
+      <a href="#">Sleeper</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
