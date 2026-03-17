@@ -35,7 +35,6 @@
     min-height: 100vh;
   }
 
-  /* === COSMIC BACKGROUND === */
   body::before {
     content: '';
     position: fixed;
@@ -47,7 +46,6 @@
     z-index: 0;
   }
 
-  /* === TOP BAR === */
   .top-bar {
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
@@ -65,18 +63,11 @@
     justify-content: space-between;
     align-items: center;
   }
-  .top-bar a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .top-bar a:hover { color: var(--accent-gold); }
   .top-bar .ticker {
     font-family: 'JetBrains Mono', monospace;
     letter-spacing: 0.5px;
   }
 
-  /* === HEADER === */
   header {
     position: relative;
     z-index: 10;
@@ -123,7 +114,6 @@
     50% { box-shadow: 0 0 20px var(--accent-portal-glow), 0 0 8px var(--accent-portal); }
   }
 
-  /* === NAV === */
   nav {
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
@@ -158,7 +148,6 @@
     border-bottom-color: var(--accent-gold);
   }
 
-  /* === MAIN LAYOUT === */
   .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -172,10 +161,7 @@
     gap: 40px;
   }
 
-  /* === FEATURED ARTICLE === */
-  .featured {
-    margin-bottom: 40px;
-  }
+  .featured { margin-bottom: 40px; }
   .featured-label {
     font-size: 0.7rem;
     font-weight: 700;
@@ -214,20 +200,10 @@
     margin-bottom: 16px;
     max-width: 640px;
   }
-  .byline {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-  }
-  .byline strong {
-    color: var(--text-secondary);
-    font-weight: 600;
-  }
-  .byline .divider {
-    margin: 0 8px;
-    color: var(--border-light);
-  }
+  .byline { font-size: 0.8rem; color: var(--text-muted); }
+  .byline strong { color: var(--text-secondary); font-weight: 600; }
+  .byline .divider { margin: 0 8px; color: var(--border-light); }
 
-  /* === ARTICLE CARDS === */
   .section-header {
     font-family: 'Playfair Display', Georgia, serif;
     font-size: 1.1rem;
@@ -251,15 +227,8 @@
   }
   .section-header .see-all:hover { color: var(--accent-gold); }
 
-  .article-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-  .article-card {
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--border);
-  }
+  .article-stack { display: flex; flex-direction: column; gap: 24px; }
+  .article-card { padding-bottom: 24px; border-bottom: 1px solid var(--border); }
   .article-card:last-child { border-bottom: none; }
   .article-card .category {
     font-size: 0.65rem;
@@ -276,11 +245,7 @@
     line-height: 1.3;
     margin-bottom: 8px;
   }
-  .article-card h3 a {
-    color: var(--text-primary);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
+  .article-card h3 a { color: var(--text-primary); text-decoration: none; transition: color 0.2s; }
   .article-card h3 a:hover { color: var(--accent-gold); }
   .article-card .preview {
     color: var(--text-secondary);
@@ -289,14 +254,8 @@
     margin-bottom: 8px;
   }
 
-  /* === SIDEBAR === */
-  .sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-  }
+  .sidebar { display: flex; flex-direction: column; gap: 32px; }
 
-  /* === FAAB MONEYLINES === */
   .moneylines-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -338,21 +297,14 @@
     align-items: center;
     margin-bottom: 8px;
   }
-  .matchup-team {
-    font-weight: 600;
-    font-size: 0.85rem;
-  }
+  .matchup-team { font-weight: 600; font-size: 0.85rem; }
   .matchup-vs {
     font-size: 0.65rem;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 2px;
   }
-  .matchup-odds {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-  }
+  .matchup-odds { display: flex; justify-content: space-between; gap: 8px; }
   .odds-btn {
     flex: 1;
     background: var(--bg-accent);
@@ -378,10 +330,7 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
-  .odds-btn .line {
-    font-size: 0.95rem;
-    font-weight: 500;
-  }
+  .odds-btn .line { font-size: 0.95rem; font-weight: 500; }
   .odds-btn .line.fav { color: var(--accent-green); }
   .odds-btn .line.dog { color: var(--accent-red); }
 
@@ -395,13 +344,8 @@
     font-size: 0.75rem;
   }
   .faab-pool .label { color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-  .faab-pool .amount {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--accent-gold);
-    font-weight: 500;
-  }
+  .faab-pool .amount { font-family: 'JetBrains Mono', monospace; color: var(--accent-gold); font-weight: 500; }
 
-  /* === STANDINGS CARD === */
   .standings-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -436,15 +380,7 @@
     color: var(--text-muted);
     font-size: 0.75rem;
   }
-  .standings-name {
-    flex: 1;
-    font-weight: 500;
-  }
-  .standings-record {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--text-secondary);
-    font-size: 0.78rem;
-  }
+  .standings-name { flex: 1; font-weight: 500; }
   .standings-faab {
     width: 60px;
     text-align: right;
@@ -453,7 +389,70 @@
     font-size: 0.78rem;
   }
 
-  /* === LORE SIDEBAR CARD === */
+  /* === FRANCHISE GRID === */
+  .franchise-grid {
+    margin-top: 48px;
+  }
+  .franchise-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .franchise-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .franchise-item:hover {
+    border-color: var(--border-light);
+    background: var(--bg-accent);
+  }
+  .franchise-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+  }
+  .franchise-item.chancellors::before { background: linear-gradient(90deg, #800020, #89CFF0); }
+  .franchise-item.vault::before { background: linear-gradient(90deg, #6B21A8, #EAB308); }
+  .franchise-item.panthers::before { background: linear-gradient(90deg, #000000, #3B82F6); }
+  .franchise-item.erectors::before { background: linear-gradient(90deg, #FF69B4, #000000); }
+  .franchise-item.sackaholics::before { background: linear-gradient(90deg, #000000, #F97316); }
+  .franchise-item.denver::before { background: linear-gradient(90deg, #1E3A5F, #0A1628); }
+  .franchise-item.mangostan::before { background: linear-gradient(90deg, #c9a84c, #2563EB); }
+
+  .franchise-name {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+  .franchise-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .franchise-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .franchise-manager {
+    margin-top: 10px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
   .lore-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -481,7 +480,31 @@
     letter-spacing: 1px;
   }
 
-  /* === FOOTER === */
+  /* === QUOTE BANNER === */
+  .quote-banner {
+    margin-top: 48px;
+    padding: 32px 40px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-gold);
+    border-radius: 0 8px 8px 0;
+    text-align: center;
+  }
+  .quote-banner blockquote {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .quote-banner .attribution {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
   footer {
     border-top: 1px solid var(--border);
     margin-top: 60px;
@@ -490,10 +513,7 @@
     position: relative;
     z-index: 1;
   }
-  .footer-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
+  .footer-inner { max-width: 1200px; margin: 0 auto; }
   .footer-brand {
     font-family: 'Playfair Display', Georgia, serif;
     font-weight: 700;
@@ -503,11 +523,7 @@
     text-transform: uppercase;
     margin-bottom: 8px;
   }
-  .footer-text {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    line-height: 1.6;
-  }
+  .footer-text { font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; }
   .footer-links {
     margin-top: 16px;
     display: flex;
@@ -524,15 +540,15 @@
   }
   .footer-links a:hover { color: var(--accent-gold); }
 
-  /* === RESPONSIVE === */
   @media (max-width: 900px) {
-    .main-grid {
-      grid-template-columns: 1fr;
-    }
+    .main-grid { grid-template-columns: 1fr; }
     .site-title { font-size: 2rem; }
     .featured h2 { font-size: 1.6rem; }
     .nav-inner { overflow-x: auto; }
     .nav-inner a { white-space: nowrap; padding: 12px 14px; }
+    .franchise-list { grid-template-columns: 1fr; }
+    .quote-banner { padding: 24px 20px; }
+    .quote-banner blockquote { font-size: 1.1rem; }
   }
 </style>
 </head>
@@ -541,7 +557,7 @@
 <!-- TOP BAR -->
 <div class="top-bar">
   <div class="top-bar-inner">
-    <span>Dynasty / Superflex / 16 Teams / Sleeper</span>
+    <span>Dynasty / Superflex / 14 Teams / Sleeper</span>
     <span class="ticker">SEASON 1 — THE INAUGURAL CAMPAIGN</span>
   </div>
 </div>
@@ -576,9 +592,9 @@
       <!-- FEATURED -->
       <article class="featured">
         <div class="featured-label">Dispatch from the Portal</div>
-        <h2><a href="#">Sixteen Owners Walked Into a Room. Only One Universe Walked Out.</a></h2>
+        <h2><a href="#">Fourteen Owners Walked Into a Room. Only One Universe Walked Out.</a></h2>
         <p class="excerpt">
-          The inaugural auction of the League of Friendship wasn't just a draft — it was a creation myth. Sixteen friends gathered, FAAB dollars in hand, and bid the multiverse into existence. Who spent recklessly? Who played the long game? And whose roster already looks like it was forged in another dimension?
+          The inaugural auction of the League of Friendship wasn't just a draft — it was a creation myth. Fourteen friends gathered at the Commissioner's home, auction dollars in hand, and bid the multiverse into existence. Hasan opened the night at $221 for Josh Allen and set the price of everything. Kimbo assembled a stack so quietly nobody noticed until it was too late. And the Commissioner? He blew half his budget on two players because they were his guys. This is the story of how it all began.
         </p>
         <div class="byline">
           <strong>Claude</strong>, Senior Staff Writer
@@ -598,9 +614,20 @@
       <div class="article-stack">
         <article class="article-card">
           <div class="category">Auction Recap</div>
-          <h3><a href="#">The $47 Man: Inside the Most Polarizing Bid of Draft Night</a></h3>
+          <h3><a href="#">$221 and the Sound of a Universe Calibrating: How Hasan's Opening Bid Set the Market</a></h3>
           <p class="preview">
-            One owner went all-in on a single player. The room erupted. Our insider breaks down the math, the madness, and what it means for the balance of power in Year One.
+            Josh Allen was the first name called. The Sacred Timeline Black Panthers placed their bid and the room held its breath. Every dollar spent after that moment was measured against it. Our insider breaks down how one number shaped fourteen rosters.
+          </p>
+          <div class="byline">
+            <strong>Claude</strong><span class="divider">|</span>Coming Soon
+          </div>
+        </article>
+
+        <article class="article-card">
+          <div class="category">Scouting Report</div>
+          <h3><a href="#">The Silent Stack: How Kimbo Built the Burrow-Chase Combo and Nobody Noticed</a></h3>
+          <p class="preview">
+            A 20-league veteran walked into an inaugural auction and assembled the most dangerous offensive stack in the league. Even the Commissioner didn't see it until the post-draft breakdown. Inside the Outworld Supreme Chancellors' masterclass.
           </p>
           <div class="byline">
             <strong>Claude</strong><span class="divider">|</span>Coming Soon
@@ -609,20 +636,9 @@
 
         <article class="article-card">
           <div class="category">Multiverse Lore</div>
-          <h3><a href="#">The Cartography of Friendship: Mapping the Sixteen Realms</a></h3>
+          <h3><a href="#">Strangers Connected by Steel: How Two Rookies Who'd Never Met Built a Roster Together</a></h3>
           <p class="preview">
-            Every team exists somewhere in the multiverse. This is the first attempt to chart the territories — from the neon-lit trading floors to the ancient keeps where dynasty rosters are etched in stone.
-          </p>
-          <div class="byline">
-            <strong>Claude</strong><span class="divider">|</span>Coming Soon
-          </div>
-        </article>
-
-        <article class="article-card">
-          <div class="category">Power Rankings</div>
-          <h3><a href="#">Preseason Power Rankings: Rating Every Roster After the Auction</a></h3>
-          <p class="preview">
-            The dust has settled. The rosters are locked. It's time to stack-rank every team in the league based on what we saw on draft night — and what our sources are whispering about what comes next.
+            Kurt had duty. AG had a plan. Neither had met the other. But they shared a friend, a football team, and a belief that black and gold runs deeper than acquaintance. The story of the Earth Erectors is the story of the League of Friendship itself.
           </p>
           <div class="byline">
             <strong>Claude</strong><span class="divider">|</span>Coming Soon
@@ -631,14 +647,73 @@
 
         <article class="article-card">
           <div class="category">The Commissioner's Desk</div>
-          <h3><a href="#">Why This League Exists: A Letter from the Commissioner</a></h3>
+          <h3><a href="#">My Team Has Holes, But It Has My Guys: A Letter from the Commissioner</a></h3>
           <p class="preview">
-            Commissioner Paul opens up about the vision behind the League of Friendship — why dynasty fantasy football is the perfect vehicle for staying connected, and what he hopes this league becomes.
+            Commissioner Paul opens up about why he built a league around friendship, why he spent half his budget on two players, and why the experience will always matter more than the trophy.
           </p>
           <div class="byline">
             <strong>Paul</strong>, Commissioner<span class="divider">|</span>Coming Soon
           </div>
         </article>
+      </div>
+
+      <!-- FRANCHISE GRID -->
+      <div class="franchise-grid">
+        <div class="section-header">
+          <span>The Franchises</span>
+          <a href="#" class="see-all">Full Profiles &rarr;</a>
+        </div>
+
+        <div class="franchise-list">
+          <div class="franchise-item chancellors">
+            <div class="franchise-name">Outworld Supreme Chancellors</div>
+            <div class="franchise-meta">Coached by Kitana &middot; Owned by Liu Kang</div>
+            <div class="franchise-desc">There are champions, and then there are champions from other realms. The Burrow-Chase stack is a Finish Him combo that the Elder Gods themselves might have ordained.</div>
+            <div class="franchise-manager">Manager: Kimbo</div>
+          </div>
+
+          <div class="franchise-item vault">
+            <div class="franchise-name">Ace Vault Squad</div>
+            <div class="franchise-meta">Coached by Will Smith &middot; Owned by Timoth&eacute;e Chalamet</div>
+            <div class="franchise-desc">Old school meets new wave. Patience at the auction built a roster that mirrors the partnership at the top — legacy and reinvention in perfect balance.</div>
+            <div class="franchise-manager">Manager: Arjun</div>
+          </div>
+
+          <div class="franchise-item panthers">
+            <div class="franchise-name">Sacred Timeline Black Panthers</div>
+            <div class="franchise-meta">Coached by Thanos &middot; Owned by Cam Newton</div>
+            <div class="franchise-desc">Josh Allen at $221 opened the auction and set the price of everything. The Sacred Timeline was written before the first bid, and Hasan is collecting the infinity stones.</div>
+            <div class="franchise-manager">Manager: Hasan</div>
+          </div>
+
+          <div class="franchise-item erectors">
+            <div class="franchise-name">Earth Erectors</div>
+            <div class="franchise-meta">Coached by Jerome Bettis &middot; Owned by Owen Wilson</div>
+            <div class="franchise-desc">Two Steelers fans who'd never met built this roster together — one on duty, one on the clock. The AFC North runs through everything. Blue-collar. No apologies.</div>
+            <div class="franchise-manager">Manager: Kurt &middot; Co-Built by AG</div>
+          </div>
+
+          <div class="franchise-item sackaholics">
+            <div class="franchise-name">Elite Sackaholics Anonymous</div>
+            <div class="franchise-meta">Coached by Eric Cartman &middot; Owned by Vince McMahon</div>
+            <div class="franchise-desc">JJ got JJ. Budget be damned. With Jayden Daniels, Justin Jefferson, and the 1.01 pick incoming, this franchise runs on chaos energy and zero apologies.</div>
+            <div class="franchise-manager">Manager: JJ</div>
+          </div>
+
+          <div class="franchise-item denver">
+            <div class="franchise-name">Denver If The Glove Fits</div>
+            <div class="franchise-meta">Coached by OJ Simpson &middot; President Diddy</div>
+            <div class="franchise-desc">An alternate timeline where OJ bought the Broncos and drained the orange. Lamar Jackson anchors a franchise from a reality that shouldn't exist but somehow contends.</div>
+            <div class="franchise-manager">Manager: Jordan</div>
+          </div>
+
+          <div class="franchise-item mangostan">
+            <div class="franchise-name">Mangostan Mountain</div>
+            <div class="franchise-meta">Guide: Tom Brady &middot; Owned by Sikander</div>
+            <div class="franchise-desc">No coach. No gameplan. Just the king of fruits and the knowledge that the experience is the win. Jeanty and Bowers anchor a roster built on heart, not spreadsheets.</div>
+            <div class="franchise-manager">Manager: Paul (Commissioner)</div>
+          </div>
+        </div>
       </div>
     </main>
 
@@ -649,98 +724,108 @@
       <div class="moneylines-card">
         <div class="moneylines-header">
           <span class="moneylines-title">FAAB Moneylines</span>
-          <span class="moneylines-week">WEEK 1</span>
+          <span class="moneylines-week">PRESEASON</span>
         </div>
 
         <div class="matchup">
           <div class="matchup-teams">
-            <span class="matchup-team">The Architects</span>
+            <span class="matchup-team">Chancellors</span>
             <span class="matchup-vs">vs</span>
-            <span class="matchup-team">Void Walkers</span>
+            <span class="matchup-team">Sackaholics</span>
           </div>
           <div class="matchup-odds">
             <div class="odds-btn">
-              <span class="team-short">ARC</span>
-              <span class="line fav">-145</span>
+              <span class="team-short">OSC</span>
+              <span class="line fav">-135</span>
             </div>
             <div class="odds-btn">
-              <span class="team-short">VOID</span>
-              <span class="line dog">+125</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="matchup">
-          <div class="matchup-teams">
-            <span class="matchup-team">Iron Council</span>
-            <span class="matchup-vs">vs</span>
-            <span class="matchup-team">Neon Prophets</span>
-          </div>
-          <div class="matchup-odds">
-            <div class="odds-btn">
-              <span class="team-short">IRON</span>
-              <span class="line dog">+110</span>
-            </div>
-            <div class="odds-btn">
-              <span class="team-short">NEON</span>
-              <span class="line fav">-130</span>
+              <span class="team-short">ESA</span>
+              <span class="line dog">+115</span>
             </div>
           </div>
         </div>
 
         <div class="matchup">
           <div class="matchup-teams">
-            <span class="matchup-team">Twilight Syndicate</span>
+            <span class="matchup-team">Black Panthers</span>
             <span class="matchup-vs">vs</span>
-            <span class="matchup-team">Dawn Brigade</span>
+            <span class="matchup-team">Mangostan Mtn</span>
           </div>
           <div class="matchup-odds">
             <div class="odds-btn">
-              <span class="team-short">TWI</span>
-              <span class="line fav">-160</span>
+              <span class="team-short">STBP</span>
+              <span class="line fav">-175</span>
             </div>
             <div class="odds-btn">
-              <span class="team-short">DAWN</span>
-              <span class="line dog">+140</span>
+              <span class="team-short">MGO</span>
+              <span class="line dog">+155</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="matchup">
+          <div class="matchup-teams">
+            <span class="matchup-team">Earth Erectors</span>
+            <span class="matchup-vs">vs</span>
+            <span class="matchup-team">Glove Fits</span>
+          </div>
+          <div class="matchup-odds">
+            <div class="odds-btn">
+              <span class="team-short">EE</span>
+              <span class="line dog">+120</span>
+            </div>
+            <div class="odds-btn">
+              <span class="team-short">DEN</span>
+              <span class="line fav">-140</span>
             </div>
           </div>
         </div>
 
         <div class="faab-pool">
-          <span class="label">Total FAAB in Play</span>
-          <span class="amount">$2,847</span>
+          <span class="label">Season Opens</span>
+          <span class="amount">WEEK 1 TBD</span>
         </div>
       </div>
 
       <!-- FAAB LEADERBOARD -->
       <div class="standings-card">
         <div class="standings-header">
-          <h3>FAAB Leaderboard</h3>
+          <h3>The Franchises</h3>
         </div>
         <div class="standings-row">
           <span class="standings-rank">1</span>
-          <span class="standings-name">The Architects</span>
-          <span class="standings-faab">$1,000</span>
+          <span class="standings-name">Sacred Timeline Black Panthers</span>
+          <span class="standings-faab"></span>
         </div>
         <div class="standings-row">
           <span class="standings-rank">2</span>
-          <span class="standings-name">Void Walkers</span>
-          <span class="standings-faab">$1,000</span>
+          <span class="standings-name">Outworld Supreme Chancellors</span>
+          <span class="standings-faab"></span>
         </div>
         <div class="standings-row">
           <span class="standings-rank">3</span>
-          <span class="standings-name">Iron Council</span>
-          <span class="standings-faab">$1,000</span>
+          <span class="standings-name">Elite Sackaholics Anonymous</span>
+          <span class="standings-faab"></span>
         </div>
         <div class="standings-row">
           <span class="standings-rank">4</span>
-          <span class="standings-name">Neon Prophets</span>
-          <span class="standings-faab">$1,000</span>
+          <span class="standings-name">Ace Vault Squad</span>
+          <span class="standings-faab"></span>
         </div>
         <div class="standings-row">
           <span class="standings-rank">5</span>
-          <span class="standings-name">Twilight Syndicate</span>
-          <span class="standings-faab">$1,000</span>
+          <span class="standings-name">Denver If The Glove Fits</span>
+          <span class="standings-faab"></span>
+        </div>
+        <div class="standings-row">
+          <span class="standings-rank">6</span>
+          <span class="standings-name">Earth Erectors</span>
+          <span class="standings-faab"></span>
+        </div>
+        <div class="standings-row">
+          <span class="standings-rank">7</span>
+          <span class="standings-name">Mangostan Mountain</span>
+          <span class="standings-faab"></span>
         </div>
       </div>
 
@@ -748,13 +833,20 @@
       <div class="lore-card">
         <h3>From the Archives</h3>
         <p>
-          "They say the first auction is always the loudest — not because of the bidding, but because it's the sound of a universe waking up. Every dollar spent is a thread pulled from one reality and woven into another."
+          "When Sikander tasted the mango in Punjab, his generals wept — not because the campaign was over, but because they too had forgotten what sweetness felt like. He built a fruit stand that afternoon. By evening, it had a name. By morning, it had an empire."
         </p>
-        <div class="source">The Archivist — Multiverse Fragment #001</div>
+        <div class="source">The Archivist — Mangostan Origin Fragment #001</div>
       </div>
 
     </aside>
   </div>
+
+  <!-- COMMISSIONER QUOTE -->
+  <div class="quote-banner">
+    <blockquote>"My team has holes, but it has my guys."</blockquote>
+    <div class="attribution">Paul — Commissioner, League of Friendship</div>
+  </div>
+
 </div>
 
 <!-- FOOTER -->
@@ -763,7 +855,7 @@
     <div class="footer-brand">League of Friendship</div>
     <div class="footer-text">
       A dynasty fantasy football league and its universe.<br>
-      Established 2026. Sixteen owners. Infinite timelines.
+      Established 2026. Fourteen owners. Infinite timelines.
     </div>
     <div class="footer-links">
       <a href="#">About</a>
