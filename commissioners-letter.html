@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Team Has Holes, But It Has My Guys — League of Friendship</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-card: #16161f;
+    --bg-accent: #1a1a2e;
+    --text-primary: #e8e6e3;
+    --text-secondary: #9a9a9a;
+    --text-muted: #5a5a6a;
+    --accent-gold: #c9a84c;
+    --accent-gold-dim: #8a7235;
+    --accent-portal: #6366f1;
+    --accent-portal-glow: #818cf8;
+    --border: #1e1e2e;
+    --border-light: #2a2a3a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(201, 168, 76, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* === TOP BAR === */
+  .top-bar {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    position: relative;
+    z-index: 10;
+  }
+  .top-bar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .top-bar .ticker {
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+  }
+
+  /* === HEADER === */
+  header {
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 24px 16px;
+    text-align: center;
+  }
+  .site-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 900;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--accent-gold), #e8d5a3, var(--accent-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .site-title:hover { opacity: 0.85; }
+
+  /* === NAV === */
+  nav {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 0;
+  }
+  .nav-inner a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 14px 20px;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+  }
+  .nav-inner a:hover { color: var(--text-primary); border-bottom-color: var(--accent-gold); }
+
+  /* === ARTICLE === */
+  .article-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .article-category {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent-gold);
+    margin-bottom: 16px;
+  }
+
+  .article-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2.6rem;
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+
+  .article-subtitle {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 28px;
+    border-left: 3px solid var(--accent-gold);
+    padding-left: 20px;
+  }
+
+  .article-byline {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 36px;
+  }
+  .article-byline strong { color: var(--text-secondary); }
+  .article-byline .divider { margin: 0 8px; color: var(--border-light); }
+
+  .article-body p {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+  }
+
+  .article-body p:first-of-type::first-letter {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 3.8rem;
+    font-weight: 900;
+    float: left;
+    line-height: 0.8;
+    padding-right: 12px;
+    padding-top: 6px;
+    color: var(--accent-gold);
+  }
+
+  .article-body .section-break {
+    text-align: center;
+    margin: 40px 0;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    letter-spacing: 8px;
+  }
+
+  .article-body .pullquote {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+    border-left: 3px solid var(--accent-portal);
+    padding: 8px 0 8px 24px;
+    margin: 40px 0;
+  }
+
+  .article-body .emphasis {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* === SIGN-OFF === */
+  .sign-off {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .sign-off .name {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+    margin-bottom: 4px;
+  }
+  .sign-off .role {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .sign-off .franchise {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 4px;
+  }
+
+  /* === FOOTER === */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 24px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-inner { max-width: 1200px; margin: 0 auto; }
+  .footer-brand {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--accent-gold-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .footer-text { font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; }
+
+  @media (max-width: 700px) {
+    .article-title { font-size: 1.8rem; }
+    .article-subtitle { font-size: 1rem; }
+    .article-body .pullquote { font-size: 1.15rem; }
+    .article-container { padding: 32px 20px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <span>Dynasty / Superflex / 14 Teams / Sleeper</span>
+    <span class="ticker">SEASON 1 — THE INAUGURAL CAMPAIGN</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="site-title">League of Friendship</a>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html">Home</a>
+    <a href="#">Articles</a>
+    <a href="#">Moneylines</a>
+    <a href="#">Power Rankings</a>
+    <a href="#">Teams</a>
+    <a href="#">The Multiverse</a>
+    <a href="#">League Lore</a>
+  </div>
+</nav>
+
+<!-- ARTICLE -->
+<div class="article-container">
+
+  <div class="article-category">The Commissioner's Desk</div>
+
+  <h1 class="article-title">My Team Has Holes, But It Has My Guys</h1>
+
+  <div class="article-subtitle">
+    A letter from the Commissioner on why the League of Friendship exists, and why the experience will always matter more than the trophy.
+  </div>
+
+  <div class="article-byline">
+    <strong>Paul</strong>, Commissioner
+    <span class="divider">|</span>
+    March 2026
+    <span class="divider">|</span>
+    4 min read
+  </div>
+
+  <div class="article-body">
+
+    <p>I have ADHD. I'm saying that up front because it's the reason this league exists. When I lock in on something, I lock in completely — hours disappear, the world shrinks to whatever has my attention, and everything else fades to the edges. For a long time, I thought that was a problem. I've learned it's actually a superpower, as long as I'm honest about what it costs. And what it has cost me, more than anything, is friendships.</p>
+
+    <p>Not in some dramatic, burned-bridges way. In the quiet way. The way where you look up one day and realize you haven't talked to someone you love in six months. A year. Longer. Life doesn't stop moving because you're hyperfocused on a project or a passion or whatever's consuming your screen at 2 AM. The people who matter don't leave — they just get further away while you're not looking.</p>
+
+    <p>I kept seeing the same pattern. Guys I grew up with, guys I played football with, guys I worked alongside — the friendships weren't dying. They were just starving for a reason to be active. And I realized something: when I play fantasy football, I'm engaged. I'm in the group chat. I'm making trade offers at midnight. I'm talking trash, analyzing rosters, debating pickups. My hyperfocus doesn't fight the friendship — it fuels it. Fantasy football is the thing that makes me show up.</p>
+
+    <p>So I built a league around it.</p>
+
+    <div class="pullquote">I needed to build the room. I needed to give us a reason to show up.</div>
+
+    <p>The League of Friendship is not a fantasy football league that happens to have friends in it. It's a friendship league that happens to use fantasy football. The distinction matters. Every decision I've made as commissioner — the dynasty format, the superflex, the auction draft, the FAAB moneylines, this website, the multiverse, the lore — all of it exists to create more reasons for fourteen people I care about to be in each other's lives.</p>
+
+    <p>Dynasty means we're not starting over every year. Your roster carries forward. Your trades have consequences that echo across seasons. It means that in July, when there's no football on TV, you're still thinking about your team, still texting your league mates about a rookie camp report, still connected. Dynasty is a commitment. That's the point.</p>
+
+    <p>The multiverse is what takes this from a league to a universe. Your team isn't just a roster — it's a franchise with a coach, an owner, a world it exists in, and a story that's being written every week. When you win, it's a chapter. When you lose, it's a plot twist. When you make a trade, it's a headline. The fantasy in fantasy football is cranked up to eleven, because if we're going to do this, we're going to do it in a way that makes people feel something.</p>
+
+    <div class="section-break">&#8226; &nbsp; &#8226; &nbsp; &#8226;</div>
+
+    <p>I want this league to be the thing that keeps us showing up for each other. Not because we scheduled a dinner that three people cancel on, but because the league gives us a reason to text, to trash-talk, to care about something together, every single week, for years.</p>
+
+    <p>Some of you are veterans of this game. Some of you are brand new. Some of you I've known since we were kids. Some of you I met more recently but the friendship hit different and I knew you belonged here. All of you are here because I want you in my life, and this is me building something that makes that easier for a brain like mine.</p>
+
+    <div class="pullquote">My team has holes, but it has my guys. And so does this league.</div>
+
+    <p>The auction was just the beginning. The stories from that night are coming — and trust me, they're worth the wait. But before we get to what happened, I wanted you to understand why it happened. Why I invited you. Why I built a website. Why I hired a staff writer. Why I care this much about a fantasy football league.</p>
+
+    <p>It's because I care this much about you.</p>
+
+    <p>Welcome to the multiverse. Welcome to Season 1. Let's make something worth remembering.</p>
+
+  </div>
+
+  <!-- SIGN-OFF -->
+  <div class="sign-off">
+    <div class="name">Paul (PFD)</div>
+    <div class="role">Commissioner &middot; League of Friendship</div>
+    <div class="franchise">Mangostan Mountain &middot; Est. 2026</div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">League of Friendship</div>
+    <div class="footer-text">
+      A dynasty fantasy football league and its universe.<br>
+      Established 2026. Fourteen owners. Infinite timelines.
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
