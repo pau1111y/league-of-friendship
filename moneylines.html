@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAAB Moneylines — League of Friendship</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-card: #16161f;
+    --bg-accent: #1a1a2e;
+    --text-primary: #e8e6e3;
+    --text-secondary: #9a9a9a;
+    --text-muted: #5a5a6a;
+    --accent-gold: #c9a84c;
+    --accent-gold-dim: #8a7235;
+    --accent-portal: #6366f1;
+    --accent-portal-glow: #818cf8;
+    --accent-green: #22c55e;
+    --accent-red: #ef4444;
+    --accent-orange: #f59e0b;
+    --border: #1e1e2e;
+    --border-light: #2a2a3a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(201, 168, 76, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .top-bar { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 6px 0; font-size: 0.75rem; color: var(--text-muted); position: relative; z-index: 10; }
+  .top-bar-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; }
+  .top-bar .ticker { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; }
+
+  header { position: relative; z-index: 10; border-bottom: 1px solid var(--border); }
+  .header-inner { max-width: 1200px; margin: 0 auto; padding: 20px 24px 16px; text-align: center; }
+  .site-title {
+    font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 1.8rem;
+    letter-spacing: 2px; text-transform: uppercase;
+    background: linear-gradient(135deg, var(--accent-gold), #e8d5a3, var(--accent-gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    text-decoration: none; display: inline-block;
+  }
+  .site-title:hover { opacity: 0.85; }
+
+  nav { background: var(--bg-secondary); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; gap: 0; }
+  .nav-inner a { color: var(--text-secondary); text-decoration: none; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; padding: 14px 20px; transition: all 0.2s; border-bottom: 2px solid transparent; }
+  .nav-inner a:hover { color: var(--text-primary); border-bottom-color: var(--accent-gold); }
+  .nav-inner a.active { color: var(--accent-gold); border-bottom-color: var(--accent-gold); }
+
+  /* === PAGE LAYOUT === */
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; position: relative; z-index: 1; }
+
+  .page-header { margin-bottom: 32px; }
+  .page-header h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2rem; font-weight: 900; margin-bottom: 8px;
+  }
+  .page-header .subtitle { color: var(--text-secondary); font-size: 0.95rem; }
+  .page-header .week-badge {
+    display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+    color: var(--accent-portal-glow); background: rgba(99, 102, 241, 0.15);
+    padding: 4px 12px; border-radius: 4px; letter-spacing: 0.5px; margin-left: 12px;
+    vertical-align: middle;
+  }
+
+  /* === FAAB BALANCE BAR === */
+  .balance-bar {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px 24px; margin-bottom: 32px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+  }
+  .balance-item { text-align: center; }
+  .balance-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 2px; }
+  .balance-value { font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; font-weight: 500; }
+  .balance-value.gold { color: var(--accent-gold); }
+  .balance-value.green { color: var(--accent-green); }
+  .balance-value.red { color: var(--accent-red); }
+  .balance-value.muted { color: var(--text-secondary); }
+  .user-info { display: flex; align-items: center; gap: 12px; }
+  .user-name { font-weight: 600; font-size: 0.9rem; }
+  .user-team { font-size: 0.75rem; color: var(--text-muted); }
+  .login-btn {
+    background: var(--accent-gold); color: var(--bg-primary); border: none; border-radius: 4px;
+    padding: 8px 20px; font-weight: 600; font-size: 0.8rem; cursor: pointer;
+    letter-spacing: 0.5px; transition: all 0.2s;
+  }
+  .login-btn:hover { opacity: 0.9; }
+
+  /* === MAIN GRID === */
+  .moneyline-grid {
+    display: grid; grid-template-columns: 1fr 380px; gap: 32px;
+  }
+
+  /* === MATCHUP CARDS === */
+  .matchups-section { }
+  .section-title {
+    font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; font-weight: 700;
+    padding-bottom: 12px; border-bottom: 2px solid var(--accent-gold); margin-bottom: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .section-title .countdown {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    color: var(--accent-red); letter-spacing: 0.5px;
+  }
+
+  .matchup-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+    margin-bottom: 16px; overflow: hidden; transition: border-color 0.2s;
+  }
+  .matchup-card:hover { border-color: var(--border-light); }
+  .matchup-card.user-matchup { border-color: var(--accent-gold-dim); }
+  .matchup-card.user-matchup::before {
+    content: 'YOUR MATCHUP'; display: block;
+    background: linear-gradient(90deg, rgba(201, 168, 76, 0.15), transparent);
+    padding: 4px 16px; font-size: 0.6rem; font-weight: 700;
+    letter-spacing: 2px; color: var(--accent-gold);
+  }
+
+  .matchup-body { padding: 20px; }
+  .matchup-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+  }
+  .matchup-number { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+  .matchup-status {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+    padding: 2px 8px; border-radius: 3px; letter-spacing: 0.5px;
+  }
+  .matchup-status.open { color: var(--accent-green); background: rgba(34, 197, 94, 0.1); }
+  .matchup-status.locked { color: var(--accent-red); background: rgba(239, 68, 68, 0.1); }
+
+  .matchup-teams-row {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center;
+    margin-bottom: 16px;
+  }
+  .team-side { text-align: center; }
+  .team-side.away { text-align: right; }
+  .team-side.home { text-align: left; }
+  .team-name-line {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700; font-size: 0.95rem; margin-bottom: 2px;
+  }
+  .team-manager { font-size: 0.7rem; color: var(--text-muted); }
+  .vs-divider {
+    font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 2px; text-align: center;
+  }
+
+  .odds-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .odds-button {
+    background: var(--bg-accent); border: 1px solid var(--border-light); border-radius: 6px;
+    padding: 12px 16px; cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .odds-button:hover { border-color: var(--accent-gold); background: rgba(201, 168, 76, 0.06); }
+  .odds-button.selected { border-color: var(--accent-gold); background: rgba(201, 168, 76, 0.12); box-shadow: 0 0 12px rgba(201, 168, 76, 0.1); }
+  .odds-button .team-abbr {
+    font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 4px;
+  }
+  .odds-button .odds-value {
+    font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 500;
+  }
+  .odds-value.fav { color: var(--accent-green); }
+  .odds-value.dog { color: var(--accent-red); }
+
+  /* === BET SLIP === */
+  .bet-slip {
+    display: none; background: var(--bg-accent); border-radius: 6px;
+    padding: 14px 16px; margin-top: 12px; border: 1px solid var(--border-light);
+  }
+  .bet-slip.active { display: block; }
+  .bet-slip-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+  }
+  .bet-slip-pick { font-size: 0.8rem; font-weight: 600; }
+  .bet-slip-odds { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent-gold); }
+  .bet-input-row { display: flex; gap: 10px; align-items: center; }
+  .bet-input-row label { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+  .bet-input {
+    flex: 1; background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: 4px;
+    padding: 8px 12px; color: var(--text-primary); font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+  }
+  .bet-input:focus { outline: none; border-color: var(--accent-gold); }
+  .bet-payout { font-size: 0.75rem; color: var(--accent-green); margin-left: 8px; white-space: nowrap; }
+  .place-bet-btn {
+    width: 100%; margin-top: 10px; padding: 10px;
+    background: linear-gradient(135deg, var(--accent-gold), #b8943f);
+    color: var(--bg-primary); border: none; border-radius: 4px;
+    font-weight: 700; font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .place-bet-btn:hover { opacity: 0.9; }
+  .self-bet-note {
+    font-size: 0.65rem; color: var(--accent-orange); margin-top: 8px; text-align: center;
+    font-style: italic;
+  }
+
+  /* === SIDEBAR === */
+  .sidebar { display: flex; flex-direction: column; gap: 24px; }
+
+  /* === LEADERBOARD === */
+  .leaderboard {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  }
+  .leaderboard-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 1rem;
+  }
+  .leader-row {
+    display: flex; align-items: center; padding: 10px 20px;
+    border-bottom: 1px solid var(--border); font-size: 0.82rem; transition: background 0.15s;
+  }
+  .leader-row:hover { background: var(--bg-accent); }
+  .leader-row:last-child { border-bottom: none; }
+  .leader-row.highlight { background: rgba(201, 168, 76, 0.06); }
+  .leader-rank {
+    width: 28px; font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted); font-size: 0.75rem;
+  }
+  .leader-rank.top { color: var(--accent-gold); font-weight: 700; }
+  .leader-name { flex: 1; font-weight: 500; }
+  .leader-record {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    color: var(--text-muted); margin-right: 16px;
+  }
+  .leader-faab {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+    color: var(--accent-gold); font-weight: 500; width: 65px; text-align: right;
+  }
+
+  /* === PUBLIC LEDGER === */
+  .ledger {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  }
+  .ledger-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .ledger-header h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 1rem; }
+  .ledger-header .live-dot {
+    width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%;
+    display: inline-block; margin-right: 6px; animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .ledger-header .live-text { font-size: 0.65rem; color: var(--accent-green); text-transform: uppercase; letter-spacing: 1px; }
+
+  .ledger-entry {
+    padding: 12px 20px; border-bottom: 1px solid var(--border);
+    font-size: 0.8rem; transition: background 0.15s;
+  }
+  .ledger-entry:hover { background: var(--bg-accent); }
+  .ledger-entry:last-child { border-bottom: none; }
+  .ledger-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .ledger-manager { font-weight: 600; }
+  .ledger-amount { font-family: 'JetBrains Mono', monospace; color: var(--accent-gold); font-size: 0.8rem; }
+  .ledger-detail { font-size: 0.72rem; color: var(--text-muted); }
+  .ledger-detail .pick { color: var(--text-secondary); font-weight: 500; }
+
+  /* === RULES CARD === */
+  .rules-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 20px;
+  }
+  .rules-card h3 {
+    font-family: 'Playfair Display', Georgia, serif; font-size: 0.95rem;
+    font-weight: 700; margin-bottom: 12px;
+  }
+  .rules-card p { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 8px; }
+  .rules-card .rule-highlight { color: var(--accent-gold); font-weight: 600; }
+
+  footer { border-top: 1px solid var(--border); margin-top: 60px; padding: 32px 24px; text-align: center; position: relative; z-index: 1; }
+  .footer-inner { max-width: 1200px; margin: 0 auto; }
+  .footer-brand { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 1rem; color: var(--accent-gold-dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .footer-text { font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; }
+
+  @media (max-width: 900px) {
+    .moneyline-grid { grid-template-columns: 1fr; }
+    .matchup-teams-row { grid-template-columns: 1fr; gap: 8px; }
+    .team-side.away, .team-side.home { text-align: center; }
+    .balance-bar { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <span>Dynasty / Superflex / 14 Teams / Sleeper</span>
+    <span class="ticker">SEASON 1 — THE INAUGURAL CAMPAIGN</span>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="site-title">League of Friendship</a>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html">Home</a>
+    <a href="#">Articles</a>
+    <a href="#" class="active">Moneylines</a>
+    <a href="#">Power Rankings</a>
+    <a href="#">Teams</a>
+    <a href="#">The Multiverse</a>
+    <a href="#">League Lore</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1>FAAB Moneylines <span class="week-badge">WEEK 1</span></h1>
+    <div class="subtitle">Back yourself. Bet the board. Every wager is public record.</div>
+  </div>
+
+  <!-- FAAB BALANCE BAR -->
+  <div class="balance-bar">
+    <div class="user-info">
+      <div>
+        <div class="user-name">PFD</div>
+        <div class="user-team">Mangostan Mountain</div>
+      </div>
+    </div>
+    <div class="balance-item">
+      <div class="balance-label">FAAB Balance</div>
+      <div class="balance-value gold">$1,000</div>
+    </div>
+    <div class="balance-item">
+      <div class="balance-label">In Play</div>
+      <div class="balance-value muted">$0</div>
+    </div>
+    <div class="balance-item">
+      <div class="balance-label">Season Record</div>
+      <div class="balance-value muted">0-0</div>
+    </div>
+    <div class="balance-item">
+      <div class="balance-label">Season P/L</div>
+      <div class="balance-value muted">$0</div>
+    </div>
+  </div>
+
+  <div class="moneyline-grid">
+
+    <!-- LEFT: MATCHUPS -->
+    <div class="matchups-section">
+      <div class="section-title">
+        <span>Week 1 Matchups</span>
+        <span class="countdown">BETS LOCK IN 4D 12H 33M</span>
+      </div>
+
+      <!-- MATCHUP 1 — USER'S MATCHUP -->
+      <div class="matchup-card user-matchup">
+        <div class="matchup-body">
+          <div class="matchup-header">
+            <span class="matchup-number">Matchup 1</span>
+            <span class="matchup-status open">OPEN</span>
+          </div>
+          <div class="matchup-teams-row">
+            <div class="team-side away">
+              <div class="team-name-line">Mangostan Mountain</div>
+              <div class="team-manager">Paul (PFD)</div>
+            </div>
+            <div class="vs-divider">vs</div>
+            <div class="team-side home">
+              <div class="team-name-line">Surrey Canucks</div>
+              <div class="team-manager">Ryan</div>
+            </div>
+          </div>
+          <div class="odds-row">
+            <div class="odds-button" onclick="toggleBetSlip(this, 'Mangostan Mountain', '+185')">
+              <div class="team-abbr">Mangostan</div>
+              <div class="odds-value dog">+185</div>
+            </div>
+            <div class="odds-button" onclick="toggleBetSlip(this, 'Surrey Canucks', '-210')">
+              <div class="team-abbr">Canucks</div>
+              <div class="odds-value fav">-210</div>
+            </div>
+          </div>
+          <div class="bet-slip" id="bet-slip-1">
+            <div class="bet-slip-header">
+              <span class="bet-slip-pick" id="pick-name-1"></span>
+              <span class="bet-slip-odds" id="pick-odds-1"></span>
+            </div>
+            <div class="bet-input-row">
+              <label>Wager:</label>
+              <input type="number" class="bet-input" placeholder="$0" min="1">
+              <span class="bet-payout">Win: $0</span>
+            </div>
+            <button class="place-bet-btn">Place Bet</button>
+            <div class="self-bet-note">You can only bet on yourself to win in your own matchup</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MATCHUP 2 -->
+      <div class="matchup-card">
+        <div class="matchup-body">
+          <div class="matchup-header">
+            <span class="matchup-number">Matchup 2</span>
+            <span class="matchup-status open">OPEN</span>
+          </div>
+          <div class="matchup-teams-row">
+            <div class="team-side away">
+              <div class="team-name-line">Outworld Supreme Chancellors</div>
+              <div class="team-manager">Kimbo</div>
+            </div>
+            <div class="vs-divider">vs</div>
+            <div class="team-side home">
+              <div class="team-name-line">Elite Sackaholics Anonymous</div>
+              <div class="team-manager">JJ</div>
+            </div>
+          </div>
+          <div class="odds-row">
+            <div class="odds-button">
+              <div class="team-abbr">Chancellors</div>
+              <div class="odds-value fav">-145</div>
+            </div>
+            <div class="odds-button">
+              <div class="team-abbr">Sackaholics</div>
+              <div class="odds-value dog">+125</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MATCHUP 3 -->
+      <div class="matchup-card">
+        <div class="matchup-body">
+          <div class="matchup-header">
+            <span class="matchup-number">Matchup 3</span>
+            <span class="matchup-status open">OPEN</span>
+          </div>
+          <div class="matchup-teams-row">
+            <div class="team-side away">
+              <div class="team-name-line">Sacred Timeline Black Panthers</div>
+              <div class="team-manager">Hasan</div>
+            </div>
+            <div class="vs-divider">vs</div>
+            <div class="team-side home">
+              <div class="team-name-line">Austin Golden Bucks</div>
+              <div class="team-manager">Cole</div>
+            </div>
+          </div>
+          <div class="odds-row">
+            <div class="odds-button">
+              <div class="team-abbr">Panthers</div>
+              <div class="odds-value fav">-190</div>
+            </div>
+            <div class="odds-button">
+              <div class="team-abbr">Bucks</div>
+              <div class="odds-value dog">+165</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MATCHUP 4 -->
+      <div class="matchup-card">
+        <div class="matchup-body">
+          <div class="matchup-header">
+            <span class="matchup-number">Matchup 4</span>
+            <span class="matchup-status open">OPEN</span>
+          </div>
+          <div class="matchup-teams-row">
+            <div class="team-side away">
+              <div class="team-name-line">Ace Vault Squad</div>
+              <div class="team-manager">Arjun</div>
+            </div>
+            <div class="vs-divider">vs</div>
+            <div class="team-side home">
+              <div class="team-name-line">New Jersey Badabings</div>
+              <div class="team-manager">Daniel</div>
+            </div>
+          </div>
+          <div class="odds-row">
+            <div class="odds-button">
+              <div class="team-abbr">Vault</div>
+              <div class="odds-value fav">-130</div>
+            </div>
+            <div class="odds-button">
+              <div class="team-abbr">Badabings</div>
+              <div class="odds-value dog">+110</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MATCHUP 5 -->
+      <div class="matchup-card">
+        <div class="matchup-body">
+          <div class="matchup-header">
+            <span class="matchup-number">Matchup 5</span>
+            <span class="matchup-status open">OPEN</span>
+          </div>
+          <div class="matchup-teams-row">
+            <div class="team-side away">
+              <div class="team-name-line">Earth Erectors</div>
+              <div class="team-manager">Kurt</div>
+            </div>
+            <div class="vs-divider">vs</div>
+            <div class="team-side home">
+              <div class="team-name-line">Denver If The Glove Fits</div>
+              <div class="team-manager">Jordan</div>
+            </div>
+          </div>
+          <div class="odds-row">
+            <div class="odds-button">
+              <div class="team-abbr">Erectors</div>
+              <div class="odds-value dog">+140</div>
+            </div>
+            <div class="odds-button">
+              <div class="team-abbr">Glove Fits</div>
+              <div class="odds-value fav">-160</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- FAAB LEADERBOARD -->
+      <div class="leaderboard">
+        <div class="leaderboard-header">FAAB Leaderboard</div>
+        <div class="leader-row highlight">
+          <span class="leader-rank top">1</span>
+          <span class="leader-name">All managers</span>
+          <span class="leader-record">0-0</span>
+          <span class="leader-faab">$1,000</span>
+        </div>
+      </div>
+
+      <!-- PUBLIC BET LEDGER -->
+      <div class="ledger">
+        <div class="ledger-header">
+          <h3>Public Bet Ledger</h3>
+          <div>
+            <span class="live-dot"></span>
+            <span class="live-text">Live</span>
+          </div>
+        </div>
+
+        <div class="ledger-entry">
+          <div class="ledger-top">
+            <span class="ledger-manager">Ryan</span>
+            <span class="ledger-amount">$150</span>
+          </div>
+          <div class="ledger-detail"><span class="pick">Surrey Canucks ML (-210)</span> vs Mangostan Mountain</div>
+        </div>
+
+        <div class="ledger-entry">
+          <div class="ledger-top">
+            <span class="ledger-manager">PFD</span>
+            <span class="ledger-amount">$75</span>
+          </div>
+          <div class="ledger-detail"><span class="pick">Mangostan Mountain ML (+185)</span> vs Surrey Canucks</div>
+        </div>
+
+        <div class="ledger-entry">
+          <div class="ledger-top">
+            <span class="ledger-manager">JJ</span>
+            <span class="ledger-amount">$200</span>
+          </div>
+          <div class="ledger-detail"><span class="pick">Sackaholics ML (+125)</span> vs Chancellors</div>
+        </div>
+
+        <div class="ledger-entry">
+          <div class="ledger-top">
+            <span class="ledger-manager">Kimbo</span>
+            <span class="ledger-amount">$50</span>
+          </div>
+          <div class="ledger-detail"><span class="pick">Chancellors ML (-145)</span> vs Sackaholics</div>
+        </div>
+
+        <div class="ledger-entry">
+          <div class="ledger-top">
+            <span class="ledger-manager">Hasan</span>
+            <span class="ledger-amount">$300</span>
+          </div>
+          <div class="ledger-detail"><span class="pick">Black Panthers ML (-190)</span> vs Golden Bucks</div>
+        </div>
+
+        <div class="ledger-entry">
+          <div class="ledger-top">
+            <span class="ledger-manager">JJ</span>
+            <span class="ledger-amount">$100</span>
+          </div>
+          <div class="ledger-detail"><span class="pick">Golden Bucks ML (+165)</span> — betting against Hasan's Panthers</div>
+        </div>
+
+      </div>
+
+      <!-- RULES -->
+      <div class="rules-card">
+        <h3>House Rules</h3>
+        <p><span class="rule-highlight">Your matchup:</span> You can only bet on yourself to win. No betting on your own loss.</p>
+        <p><span class="rule-highlight">Other matchups:</span> Bet either side at posted odds.</p>
+        <p><span class="rule-highlight">No limits.</span> Wager any amount. This is an open world.</p>
+        <p><span class="rule-highlight">All bets are public.</span> Every wager appears on the ledger. Everyone sees everything.</p>
+        <p><span class="rule-highlight">FAAB is survival.</span> Run out and you can't add players. Trade for more or go without.</p>
+      </div>
+
+    </aside>
+
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">League of Friendship</div>
+    <div class="footer-text">
+      A dynasty fantasy football league and its universe.<br>
+      Established 2026. Fourteen owners. Infinite timelines.
+    </div>
+  </div>
+</footer>
+
+<script>
+function toggleBetSlip(btn, team, odds) {
+  const card = btn.closest('.matchup-card');
+  const slip = card.querySelector('.bet-slip');
+  const allBtns = card.querySelectorAll('.odds-button');
+  allBtns.forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  slip.classList.add('active');
+  card.querySelector('.bet-slip-pick').textContent = team;
+  card.querySelector('.bet-slip-odds').textContent = odds;
+
+  const input = slip.querySelector('.bet-input');
+  const payout = slip.querySelector('.bet-payout');
+  input.oninput = function() {
+    const wager = parseFloat(this.value) || 0;
+    let profit = 0;
+    const o = parseInt(odds);
+    if (o > 0) {
+      profit = wager * (o / 100);
+    } else {
+      profit = wager * (100 / Math.abs(o));
+    }
+    payout.textContent = 'Win: $' + profit.toFixed(0);
+  };
+}
+</script>
+
+</body>
+</html>
