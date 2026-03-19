@@ -315,7 +315,7 @@ const SUPABASE_URL = 'https://ddlypehvxaftkxzujkqy.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkbHlwZWh2eGFmdGt4enVqa3F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTQ2ODAsImV4cCI6MjA4OTM3MDY4MH0.dtKQE9d4hAitu-ZM715NEjvYVfTRhPNcRdQlNTyh83Q';
 const SLEEPER_LEAGUE_ID = '1302933004313710592';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============================================
 // APP STATE
@@ -334,7 +334,7 @@ document.getElementById('auth-submit').addEventListener('click', async () => {
   const msg = document.getElementById('auth-msg');
   if (!email) { msg.textContent = 'Enter your email'; msg.className = 'auth-msg error'; return; }
 
-  const { error } = await supabase.auth.signInWithOtp({
+  const { error } = await sb.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: window.location.href }
   });
@@ -349,11 +349,11 @@ document.getElementById('auth-submit').addEventListener('click', async () => {
 });
 
 document.getElementById('auth-signout').addEventListener('click', async () => {
-  await supabase.auth.signOut();
+  await sb.auth.signOut();
   window.location.reload();
 });
 
-supabase.auth.onAuthStateChange(async (event, session) => {
+sb.auth.onAuthStateChange(async (event, session) => {
   if (session?.user) {
     currentUser = session.user;
     await loadManager();
@@ -381,7 +381,7 @@ function updateAuthUI(loggedIn) {
 
 async function loadManager() {
   if (!currentUser) return;
-  const { data } = await supabase
+  const { data } = await sb
     .from('managers')
     .select('*')
     .eq('auth_id', currentUser.id)
@@ -401,17 +401,17 @@ async function loadAll() {
 }
 
 async function loadManagers() {
-  const { data } = await supabase.from('managers').select('*').order('faab_balance', { ascending: false });
+  const { data } = await sb.from('managers').select('*').order('faab_balance', { ascending: false });
   allManagers = data || [];
 }
 
 async function loadMatchups() {
-  const { data } = await supabase.from('weekly_matchups').select('*').order('week_number', { ascending: false });
+  const { data } = await sb.from('weekly_matchups').select('*').order('week_number', { ascending: false });
   matchups = data || [];
 }
 
 async function loadBets() {
-  const { data } = await supabase.from('bets').select('*').order('created_at', { ascending: false });
+  const { data } = await sb.from('bets').select('*').order('created_at', { ascending: false });
   bets = data || [];
 }
 
@@ -564,7 +564,7 @@ async function placeBet(matchupId) {
   btn.disabled = true;
   btn.textContent = 'Placing bet...';
 
-  const { data, error } = await supabase.rpc('place_bet', {
+  const { data, error } = await sb.rpc('place_bet', {
     p_manager_id: currentManager.id,
     p_matchup_id: activeBet.matchupId,
     p_picked_team_id: activeBet.teamId,
@@ -670,7 +670,7 @@ function updateBalance() {
 // INIT
 // ============================================
 (async function init() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
     currentUser = session.user;
     await loadManager();
