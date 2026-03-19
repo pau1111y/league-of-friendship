@@ -389,7 +389,17 @@ const SLEEPER_API = 'https://api.sleeper.app/v1';
 
 const AUTH_STORAGE_KEY = 'sb-ddlypehvxaftkxzujkqy-auth-token';
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Create client with lock disabled to prevent Navigator Lock deadlocks
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    storageKey: AUTH_STORAGE_KEY,
+    detectSessionInUrl: false,
+    persistSession: true,
+    autoRefreshToken: true,
+    // Provide a no-op lock so Supabase never touches Navigator Locks API
+    lock: (name, acquireTimeout, fn) => fn()
+  }
+});
 
 // ============================================
 // APP STATE
@@ -405,27 +415,34 @@ let sleeperUsers = [];
 let sleeperMatchupsCache = {};
 let algoScoresCache = null;
 let activeTab = 'managers';
-let authReady = false; // flag to prevent double-init from onAuthStateChange
 
 // Vote ordering state
 let voteOrder = []; // array of manager IDs in the user's chosen order
 
 // ============================================
-// AUTH — Shared cross-page session pattern
+// AUTH — Lock-free cross-page session pattern
 // ============================================
 
-// Read session from localStorage instantly (no async, no Navigator Lock)
+// Read session from localStorage instantly (no async, no locks)
 function getStoredSession() {
   try {
     const raw = localStorage.getItem(AUTH_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    // Supabase stores { access_token, refresh_token, user, ... }
     if (parsed?.user) return parsed;
-    // Some versions nest under current_session or session
     if (parsed?.currentSession?.user) return parsed.currentSession;
     return null;
   } catch (e) { return null; }
+}
+
+// Full auth refresh after sign-in or sign-up
+async function handleAuthSuccess(user) {
+  currentUser = user;
+  await loadManager();
+  await loadAll();
+  updateAuthUI(true);
+  renderActiveTab();
+  renderVotersSidebar();
 }
 
 document.getElementById('auth-signin').addEventListener('click', async () => {
@@ -434,8 +451,10 @@ document.getElementById('auth-signin').addEventListener('click', async () => {
   const msg = document.getElementById('auth-msg');
   if (!email || !password) { msg.textContent = 'Enter email and password'; msg.className = 'auth-msg error'; return; }
   msg.textContent = 'Signing in...'; msg.className = 'auth-msg';
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) { msg.textContent = error.message; msg.className = 'auth-msg error'; }
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { msg.textContent = error.message; msg.className = 'auth-msg error'; return; }
+  msg.textContent = '';
+  await handleAuthSuccess(data.user);
 });
 
 document.getElementById('auth-signup').addEventListener('click', async () => {
@@ -444,33 +463,14 @@ document.getElementById('auth-signup').addEventListener('click', async () => {
   const msg = document.getElementById('auth-msg');
   if (!email || !password) { msg.textContent = 'Enter email and password'; msg.className = 'auth-msg error'; return; }
   if (password.length < 6) { msg.textContent = 'Password must be at least 6 characters'; msg.className = 'auth-msg error'; return; }
-  const { error } = await sb.auth.signUp({ email, password });
-  if (error) { msg.textContent = error.message; msg.className = 'auth-msg error'; }
-  else { msg.textContent = 'Account created! You are now signed in.'; msg.className = 'auth-msg'; }
+  const { data, error } = await sb.auth.signUp({ email, password });
+  if (error) { msg.textContent = error.message; msg.className = 'auth-msg error'; return; }
+  msg.textContent = 'Account created!'; msg.className = 'auth-msg';
+  await handleAuthSuccess(data.user);
 });
 
 document.getElementById('auth-password').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('auth-signin').click();
-});
-
-// Handle sign-in / sign-out / token refresh events
-sb.auth.onAuthStateChange(async (event, session) => {
-  console.log('[auth] onAuthStateChange:', event);
-  if (event === 'INITIAL_SESSION' && authReady) return; // Already handled by init
-  if (session?.user) {
-    currentUser = session.user;
-    await loadManager();
-    await loadAll();
-    updateAuthUI(true);
-    renderActiveTab();
-    renderVotersSidebar();
-  } else if (event === 'SIGNED_OUT') {
-    currentUser = null;
-    currentManager = null;
-    updateAuthUI(false);
-    renderActiveTab();
-    renderVotersSidebar();
-  }
 });
 
 function updateAuthUI(loggedIn) {
@@ -523,8 +523,22 @@ function updateAuthUI(loggedIn) {
 }
 
 // Sign out handlers
-document.getElementById('auth-signout').addEventListener('click', () => sb.auth.signOut());
-document.getElementById('auth-signout-claim')?.addEventListener('click', () => sb.auth.signOut());
+document.getElementById('auth-signout').addEventListener('click', async () => {
+  await sb.auth.signOut();
+  currentUser = null;
+  currentManager = null;
+  updateAuthUI(false);
+  renderActiveTab();
+  renderVotersSidebar();
+});
+document.getElementById('auth-signout-claim')?.addEventListener('click', async () => {
+  await sb.auth.signOut();
+  currentUser = null;
+  currentManager = null;
+  updateAuthUI(false);
+  renderActiveTab();
+  renderVotersSidebar();
+});
 
 // Claim handler
 document.getElementById('claim-btn').addEventListener('click', async () => {
@@ -1152,18 +1166,17 @@ async function publishRankings() {
 // INIT
 // ============================================
 (async function init() {
-  // 1) Restore session from localStorage instantly (no async, no locks)
+  // 1) Restore session from localStorage instantly (no async, no Navigator Locks)
   const stored = getStoredSession();
   if (stored?.user) {
     currentUser = stored.user;
-    authReady = true;
   }
 
-  // 2) Load all public data + manager data in parallel
+  // 2) Load manager data if session exists, then all public data
   if (currentUser) await loadManager();
   await loadAll();
 
-  // 3) Update UI with whatever auth state we have
+  // 3) Render everything
   if (currentUser) updateAuthUI(true);
   renderActiveTab();
   renderVotersSidebar();
