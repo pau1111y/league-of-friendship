@@ -498,6 +498,8 @@ const SUPABASE_URL = 'https://ddlypehvxaftkxzujkqy.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkbHlwZWh2eGFmdGt4enVqa3F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTQ2ODAsImV4cCI6MjA4OTM3MDY4MH0.dtKQE9d4hAitu-ZM715NEjvYVfTRhPNcRdQlNTyh83Q';
 const SLEEPER_LEAGUE_ID = '1302933004313710592';
 
+const AUTH_STORAGE_KEY = 'sb-ddlypehvxaftkxzujkqy-auth-token';
+
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============================================
@@ -508,18 +510,31 @@ let currentManager = null;
 let allManagers = [];
 let matchups = [];
 let bets = [];
+let authReady = false; // flag to prevent double-init from onAuthStateChange
 
 // ============================================
-// AUTH
+// AUTH — Shared cross-page session pattern
 // ============================================
+
+// Read session from localStorage instantly (no async, no Navigator Lock)
+function getStoredSession() {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed?.user) return parsed;
+    if (parsed?.currentSession?.user) return parsed.currentSession;
+    return null;
+  } catch (e) { return null; }
+}
+
 document.getElementById('auth-signin').addEventListener('click', async () => {
   const email = document.getElementById('auth-email').value.trim();
   const password = document.getElementById('auth-password').value;
   const msg = document.getElementById('auth-msg');
   if (!email || !password) { msg.textContent = 'Enter email and password'; msg.className = 'auth-msg error'; return; }
-
+  msg.textContent = 'Signing in...'; msg.className = 'auth-msg';
   const { error } = await sb.auth.signInWithPassword({ email, password });
-
   if (error) {
     msg.textContent = error.message;
     msg.className = 'auth-msg error';
@@ -532,9 +547,7 @@ document.getElementById('auth-signup').addEventListener('click', async () => {
   const msg = document.getElementById('auth-msg');
   if (!email || !password) { msg.textContent = 'Enter email and password'; msg.className = 'auth-msg error'; return; }
   if (password.length < 6) { msg.textContent = 'Password must be at least 6 characters'; msg.className = 'auth-msg error'; return; }
-
   const { error } = await sb.auth.signUp({ email, password });
-
   if (error) {
     msg.textContent = error.message;
     msg.className = 'auth-msg error';
@@ -565,9 +578,7 @@ document.getElementById('claim-btn').addEventListener('click', async () => {
   const msg = document.getElementById('claim-msg');
   const managerId = select.value;
   if (!managerId) { msg.textContent = 'Select your Sleeper account'; msg.className = 'auth-msg error'; return; }
-
   const { error } = await sb.rpc('claim_manager', { p_manager_id: managerId });
-
   if (error) {
     msg.textContent = 'Error: ' + error.message;
     msg.className = 'auth-msg error';
@@ -580,7 +591,11 @@ document.getElementById('claim-btn').addEventListener('click', async () => {
   }
 });
 
+// Handle sign-in / sign-out / token refresh events
 sb.auth.onAuthStateChange(async (event, session) => {
+  console.log('[auth] onAuthStateChange:', event);
+  if (event === 'INITIAL_SESSION' && authReady) return; // Already handled by init
+
   if (session?.user) {
     currentUser = session.user;
     await loadManager();
@@ -595,14 +610,13 @@ sb.auth.onAuthStateChange(async (event, session) => {
       renderCommishMatchups();
       renderCommishSideBets();
     } else if (allManagers.length === 0) {
-      // First user, no managers yet — show setup
       document.getElementById('commish-panel').classList.add('visible');
       document.getElementById('commish-setup').style.display = 'block';
       document.getElementById('commish-body').classList.add('open');
       document.getElementById('commish-toggle').textContent = 'COLLAPSE';
       loadSleeperUsersForSetup();
     }
-  } else {
+  } else if (event === 'SIGNED_OUT') {
     currentUser = null;
     currentManager = null;
     updateAuthUI(false);
@@ -1663,16 +1677,34 @@ async function placeSideBet(betId) {
 // INIT
 // ============================================
 (async function init() {
-  // Load public data immediately (no auth needed for SELECT policies)
+  // 1) Restore session from localStorage instantly (no async, no locks)
+  const stored = getStoredSession();
+  if (stored?.user) {
+    currentUser = stored.user;
+    authReady = true;
+  }
+
+  // 2) Load manager data if we have a session, then public data
+  if (currentUser) await loadManager();
   await loadAll();
   await loadSideBets();
 
-  // Render public UI
+  // 3) Update UI
+  if (currentUser) updateAuthUI(true);
   renderSideAction();
 
-  // Auth state is handled entirely by onAuthStateChange above.
-  // Do NOT call sb.auth.getSession() here — it deadlocks with
-  // onAuthStateChange via the Navigator Locks API in Supabase JS v2.
+  // 4) Commissioner panel logic
+  if (currentManager?.is_commissioner) {
+    document.getElementById('commish-panel').classList.add('visible');
+    renderCommishMatchups();
+    renderCommishSideBets();
+  } else if (currentUser && allManagers.length === 0) {
+    document.getElementById('commish-panel').classList.add('visible');
+    document.getElementById('commish-setup').style.display = 'block';
+    document.getElementById('commish-body').classList.add('open');
+    document.getElementById('commish-toggle').textContent = 'COLLAPSE';
+    loadSleeperUsersForSetup();
+  }
 })();
 </script>
 

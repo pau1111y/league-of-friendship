@@ -387,6 +387,8 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const SLEEPER_LEAGUE_ID = '1302933004313710592';
 const SLEEPER_API = 'https://api.sleeper.app/v1';
 
+const AUTH_STORAGE_KEY = 'sb-ddlypehvxaftkxzujkqy-auth-token';
+
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ============================================
@@ -403,18 +405,35 @@ let sleeperUsers = [];
 let sleeperMatchupsCache = {};
 let algoScoresCache = null;
 let activeTab = 'managers';
+let authReady = false; // flag to prevent double-init from onAuthStateChange
 
 // Vote ordering state
 let voteOrder = []; // array of manager IDs in the user's chosen order
 
 // ============================================
-// AUTH
+// AUTH — Shared cross-page session pattern
 // ============================================
+
+// Read session from localStorage instantly (no async, no Navigator Lock)
+function getStoredSession() {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Supabase stores { access_token, refresh_token, user, ... }
+    if (parsed?.user) return parsed;
+    // Some versions nest under current_session or session
+    if (parsed?.currentSession?.user) return parsed.currentSession;
+    return null;
+  } catch (e) { return null; }
+}
+
 document.getElementById('auth-signin').addEventListener('click', async () => {
   const email = document.getElementById('auth-email').value.trim();
   const password = document.getElementById('auth-password').value;
   const msg = document.getElementById('auth-msg');
   if (!email || !password) { msg.textContent = 'Enter email and password'; msg.className = 'auth-msg error'; return; }
+  msg.textContent = 'Signing in...'; msg.className = 'auth-msg';
   const { error } = await sb.auth.signInWithPassword({ email, password });
   if (error) { msg.textContent = error.message; msg.className = 'auth-msg error'; }
 });
@@ -434,16 +453,23 @@ document.getElementById('auth-password').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('auth-signin').click();
 });
 
+// Handle sign-in / sign-out / token refresh events
 sb.auth.onAuthStateChange(async (event, session) => {
+  console.log('[auth] onAuthStateChange:', event);
+  if (event === 'INITIAL_SESSION' && authReady) return; // Already handled by init
   if (session?.user) {
     currentUser = session.user;
     await loadManager();
     await loadAll();
     updateAuthUI(true);
-  } else {
+    renderActiveTab();
+    renderVotersSidebar();
+  } else if (event === 'SIGNED_OUT') {
     currentUser = null;
     currentManager = null;
     updateAuthUI(false);
+    renderActiveTab();
+    renderVotersSidebar();
   }
 });
 
@@ -1126,22 +1152,23 @@ async function publishRankings() {
 // INIT
 // ============================================
 (async function init() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) {
-    currentUser = session.user;
-    await loadManager();
+  // 1) Restore session from localStorage instantly (no async, no locks)
+  const stored = getStoredSession();
+  if (stored?.user) {
+    currentUser = stored.user;
+    authReady = true;
   }
 
+  // 2) Load all public data + manager data in parallel
+  if (currentUser) await loadManager();
   await loadAll();
 
-  if (currentUser) {
-    updateAuthUI(true);
-  }
-
+  // 3) Update UI with whatever auth state we have
+  if (currentUser) updateAuthUI(true);
   renderActiveTab();
   renderVotersSidebar();
 
-  // Try to load superlatives from algo
+  // 4) Try to load superlatives from algo
   try {
     const scores = await calculatePowerScores();
     renderSuperlatives(scores);
