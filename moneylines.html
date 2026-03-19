@@ -584,13 +584,30 @@ sb.auth.onAuthStateChange(async (event, session) => {
   if (session?.user) {
     currentUser = session.user;
     await loadManager();
+    await loadAll();
+    await loadSideBets();
     updateAuthUI(true);
-    loadAll();
+    renderSideAction();
+
+    // Commissioner panel logic
+    if (currentManager?.is_commissioner) {
+      document.getElementById('commish-panel').classList.add('visible');
+      renderCommishMatchups();
+      renderCommishSideBets();
+    } else if (allManagers.length === 0) {
+      // First user, no managers yet — show setup
+      document.getElementById('commish-panel').classList.add('visible');
+      document.getElementById('commish-setup').style.display = 'block';
+      document.getElementById('commish-body').classList.add('open');
+      document.getElementById('commish-toggle').textContent = 'COLLAPSE';
+      loadSleeperUsersForSetup();
+    }
   } else {
     currentUser = null;
     currentManager = null;
     updateAuthUI(false);
-    loadAll();
+    renderSideAction();
+    document.getElementById('commish-panel').classList.remove('visible');
   }
 });
 
@@ -1646,37 +1663,16 @@ async function placeSideBet(betId) {
 // INIT
 // ============================================
 (async function init() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) {
-    currentUser = session.user;
-    await loadManager();
-  }
-
-  // Load all data first so allManagers is populated for claim dropdown + commissioner check
+  // Load public data immediately (no auth needed for SELECT policies)
   await loadAll();
   await loadSideBets();
 
-  // Now update UI with full data available
-  if (currentUser) {
-    updateAuthUI(true);
-  }
-
-  // Render side action for everyone
+  // Render public UI
   renderSideAction();
 
-  // Commissioner panel logic (runs after allManagers is loaded)
-  if (currentManager?.is_commissioner) {
-    document.getElementById('commish-panel').classList.add('visible');
-    renderCommishMatchups();
-    renderCommishSideBets();
-  } else if (currentUser && allManagers.length === 0) {
-    // First user, no managers yet — show setup
-    document.getElementById('commish-panel').classList.add('visible');
-    document.getElementById('commish-setup').style.display = 'block';
-    document.getElementById('commish-body').classList.add('open');
-    document.getElementById('commish-toggle').textContent = 'COLLAPSE';
-    loadSleeperUsersForSetup();
-  }
+  // Auth state is handled entirely by onAuthStateChange above.
+  // Do NOT call sb.auth.getSession() here — it deadlocks with
+  // onAuthStateChange via the Navigator Locks API in Supabase JS v2.
 })();
 </script>
 
