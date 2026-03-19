@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power Rankings — League of Friendship</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg-primary: #0a0a0f;
+    --bg-secondary: #12121a;
+    --bg-card: #16161f;
+    --bg-accent: #1a1a2e;
+    --text-primary: #e8e6e3;
+    --text-secondary: #9a9a9a;
+    --text-muted: #5a5a6a;
+    --accent-gold: #c9a84c;
+    --accent-gold-dim: #8a7235;
+    --accent-portal: #6366f1;
+    --accent-portal-glow: #818cf8;
+    --accent-green: #22c55e;
+    --accent-red: #ef4444;
+    --accent-orange: #f59e0b;
+    --border: #1e1e2e;
+    --border-light: #2a2a3a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-primary); color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif; line-height: 1.6; min-height: 100vh;
+  }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(201, 168, 76, 0.05) 0%, transparent 50%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .top-bar { background: var(--bg-secondary); border-bottom: 1px solid var(--border); padding: 6px 0; font-size: 0.75rem; color: var(--text-muted); position: relative; z-index: 10; }
+  .top-bar-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; }
+  .top-bar .ticker { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; }
+
+  header { position: relative; z-index: 10; border-bottom: 1px solid var(--border); }
+  .header-inner { max-width: 1200px; margin: 0 auto; padding: 20px 24px 16px; text-align: center; }
+  .site-title { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 1.8rem; letter-spacing: 2px; text-transform: uppercase; background: linear-gradient(135deg, var(--accent-gold), #e8d5a3, var(--accent-gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; display: inline-block; }
+
+  nav { background: var(--bg-secondary); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; }
+  .nav-inner a { color: var(--text-secondary); text-decoration: none; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; padding: 14px 20px; transition: all 0.2s; border-bottom: 2px solid transparent; }
+  .nav-inner a:hover { color: var(--text-primary); border-bottom-color: var(--accent-gold); }
+  .nav-inner a.active { color: var(--accent-gold); border-bottom-color: var(--accent-gold); }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; position: relative; z-index: 1; }
+
+  .page-header { margin-bottom: 32px; }
+  .page-header h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 2rem; font-weight: 900; margin-bottom: 8px; }
+  .page-header .subtitle { color: var(--text-secondary); font-size: 0.95rem; }
+  .week-selector { display: inline-flex; gap: 8px; align-items: center; margin-left: 16px; vertical-align: middle; }
+  .week-selector select { background: var(--bg-accent); border: 1px solid var(--border-light); border-radius: 4px; padding: 6px 12px; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+  .week-selector select:focus { outline: none; border-color: var(--accent-gold); }
+
+  /* RANKINGS GRID */
+  .rankings-layout { display: grid; grid-template-columns: 1fr 380px; gap: 32px; }
+
+  /* RANKING CARDS */
+  .ranking-entry { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; display: grid; grid-template-columns: 64px 1fr; transition: border-color 0.2s; }
+  .ranking-entry:hover { border-color: var(--border-light); }
+  .ranking-entry.top-3 { border-color: var(--accent-gold-dim); }
+  .ranking-entry.top-3:hover { border-color: var(--accent-gold); }
+
+  .rank-badge { display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-accent); border-right: 1px solid var(--border); padding: 12px 8px; }
+  .rank-number { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 1.6rem; color: var(--text-muted); line-height: 1; }
+  .top-3 .rank-number { color: var(--accent-gold); }
+  .rank-movement { font-size: 0.65rem; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+  .rank-movement.up { color: var(--accent-green); }
+  .rank-movement.down { color: var(--accent-red); }
+  .rank-movement.same { color: var(--text-muted); }
+
+  .rank-details { padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; }
+  .rank-top-row { display: flex; justify-content: space-between; align-items: flex-start; }
+  .rank-team-name { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 1.05rem; }
+  .rank-manager { font-size: 0.72rem; color: var(--text-muted); }
+  .rank-score { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--accent-gold); white-space: nowrap; }
+
+  .rank-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+  .rank-stat { font-size: 0.72rem; color: var(--text-secondary); }
+  .rank-stat-label { color: var(--text-muted); margin-right: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.6rem; }
+  .rank-stat-value { font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+
+  .rank-blurb { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; font-style: italic; border-left: 2px solid var(--accent-gold-dim); padding-left: 12px; margin-top: 4px; }
+
+  /* SIDEBAR */
+  .sidebar { display: flex; flex-direction: column; gap: 24px; }
+
+  .methodology-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+  .methodology-card h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; }
+  .methodology-card p { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 8px; }
+  .methodology-card .factor { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.78rem; }
+  .methodology-card .factor:last-child { border-bottom: none; }
+  .methodology-card .factor-name { color: var(--text-secondary); }
+  .methodology-card .factor-weight { font-family: 'JetBrains Mono', monospace; color: var(--accent-gold); }
+
+  .top-performers { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .top-performers h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 0.95rem; font-weight: 700; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .top-perf-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+  .top-perf-row:last-child { border-bottom: none; }
+  .top-perf-label { color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+  .top-perf-value { font-family: 'JetBrains Mono', monospace; color: var(--accent-gold); font-size: 0.82rem; }
+
+  /* COMMISH RANKINGS EDITOR */
+  .commish-panel { background: var(--bg-card); border: 2px solid var(--accent-portal); border-radius: 8px; padding: 24px; margin-bottom: 32px; display: none; }
+  .commish-panel.visible { display: block; }
+  .commish-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; cursor: pointer; }
+  .commish-panel-header h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; font-weight: 700; color: var(--accent-portal-glow); }
+  .commish-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--accent-portal-glow); background: rgba(99, 102, 241, 0.15); padding: 3px 10px; border-radius: 3px; letter-spacing: 1px; text-transform: uppercase; }
+  .commish-body { display: none; }
+  .commish-body.open { display: block; }
+  .commish-btn { background: var(--accent-portal); color: white; border: none; border-radius: 4px; padding: 8px 20px; font-weight: 600; font-size: 0.78rem; cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s; }
+  .commish-btn:hover { background: var(--accent-portal-glow); }
+  .commish-btn.success { background: var(--accent-green); }
+  .commish-msg { font-size: 0.78rem; color: var(--accent-green); margin-top: 8px; }
+  .commish-msg.error { color: var(--accent-red); }
+
+  .rank-editor-row { background: var(--bg-accent); border: 1px solid var(--border-light); border-radius: 6px; padding: 12px 16px; margin-bottom: 8px; display: grid; grid-template-columns: 50px 1fr 2fr; gap: 12px; align-items: center; }
+  .rank-editor-row input[type="number"] { background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: 4px; padding: 6px 8px; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; width: 50px; text-align: center; }
+  .rank-editor-row input[type="number"]:focus { outline: none; border-color: var(--accent-portal); }
+  .rank-editor-row textarea { background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: 4px; padding: 6px 10px; color: var(--text-primary); font-size: 0.8rem; resize: vertical; min-height: 40px; font-family: 'Inter', sans-serif; }
+  .rank-editor-row textarea:focus { outline: none; border-color: var(--accent-portal); }
+  .rank-editor-name { font-weight: 600; font-size: 0.85rem; }
+  .rank-editor-manager { font-size: 0.7rem; color: var(--text-muted); }
+
+  footer { border-top: 1px solid var(--border); margin-top: 60px; padding: 32px 24px; text-align: center; position: relative; z-index: 1; }
+  .footer-brand { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 1rem; color: var(--accent-gold-dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .footer-text { font-size: 0.75rem; color: var(--text-muted); line-height: 1.6; }
+
+  @media (max-width: 900px) {
+    .rankings-layout { grid-template-columns: 1fr; }
+    .ranking-entry { grid-template-columns: 50px 1fr; }
+    .rank-stats { gap: 12px; }
+    .rank-editor-row { grid-template-columns: 40px 1fr; }
+    .rank-editor-row textarea { grid-column: 1 / -1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <span>Dynasty / Superflex / 14 Teams / Sleeper</span>
+    <span class="ticker">SEASON 1 — THE INAUGURAL CAMPAIGN</span>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="site-title">League of Friendship</a>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html">Home</a>
+    <a href="#">Articles</a>
+    <a href="moneylines.html">Moneylines</a>
+    <a href="powerrankings.html" class="active">Power Rankings</a>
+    <a href="#">Teams</a>
+    <a href="#">The Multiverse</a>
+    <a href="#">League Lore</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1>Power Rankings
+      <span class="week-selector">
+        <select id="rankings-week-select" onchange="changeRankingsWeek()">
+          <option value="latest">Latest</option>
+        </select>
+      </span>
+    </h1>
+    <div class="subtitle">The Commissioner's poll meets the algorithm. Not everyone agrees, and that's the point.</div>
+  </div>
+
+  <!-- COMMISSIONER: Rankings Editor -->
+  <div class="commish-panel" id="commish-panel">
+    <div class="commish-panel-header" onclick="toggleCommishPanel()">
+      <h2>Publish Rankings</h2>
+      <span class="commish-badge" id="commish-toggle">EXPAND</span>
+    </div>
+    <div class="commish-body" id="commish-body">
+      <p style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:12px;">Drag the algorithm's suggestion below, adjust ranks, add your blurbs, and publish. The algorithm generates a starting order — you override it with the eye test.</p>
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+        <input type="text" id="rankings-label-input" placeholder='Label (e.g. "Post-Auction", "Week 3")' style="background:var(--bg-primary);border:1px solid var(--border-light);border-radius:4px;padding:8px 14px;color:var(--text-primary);font-size:0.85rem;min-width:240px;">
+        <button class="commish-btn" onclick="generateAlgoRankings()">Generate from Algorithm</button>
+        <button class="commish-btn success" onclick="publishRankings()">Publish Rankings</button>
+      </div>
+      <div id="rank-editor-container">
+        <div style="color:var(--text-muted);font-size:0.82rem;font-style:italic;">Click "Generate from Algorithm" to populate, then adjust.</div>
+      </div>
+      <div class="commish-msg" id="rankings-publish-msg"></div>
+    </div>
+  </div>
+
+  <div class="rankings-layout">
+    <!-- LEFT: Rankings -->
+    <div id="rankings-container">
+      <div style="text-align:center; padding:40px; color:var(--text-muted); font-style:italic;">Loading power rankings...</div>
+    </div>
+
+    <!-- RIGHT: Sidebar -->
+    <aside class="sidebar">
+      <div class="methodology-card">
+        <h3>The Algorithm</h3>
+        <p>The power score blends Sleeper data with the Commissioner's eye test. The algorithm suggests — the Commissioner decides.</p>
+        <div class="factor">
+          <span class="factor-name">FAAB Remaining</span>
+          <span class="factor-weight">25%</span>
+        </div>
+        <div class="factor">
+          <span class="factor-name">Points Scored (Season)</span>
+          <span class="factor-weight">25%</span>
+        </div>
+        <div class="factor">
+          <span class="factor-name">Win/Loss Record</span>
+          <span class="factor-weight">20%</span>
+        </div>
+        <div class="factor">
+          <span class="factor-name">Betting Record (P/L)</span>
+          <span class="factor-weight">15%</span>
+        </div>
+        <div class="factor">
+          <span class="factor-name">Roster Value Proxy</span>
+          <span class="factor-weight">15%</span>
+        </div>
+      </div>
+
+      <div class="top-performers">
+        <h3>League Superlatives</h3>
+        <div id="superlatives-container">
+          <div class="top-perf-row">
+            <div>
+              <div class="top-perf-label">Highest Scorer</div>
+              <div>—</div>
+            </div>
+            <div class="top-perf-value">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="methodology-card">
+        <h3>Commissioner's Note</h3>
+        <p id="commish-note" style="font-style:italic;">"Rankings are opinions, not facts. That's what makes them fun. Argue with me in the group chat."</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">League of Friendship</div>
+    <div class="footer-text">A dynasty fantasy football league and its universe.<br>Established 2026. Fourteen owners. Infinite timelines.</div>
+  </div>
+</footer>
+
+<script>
+// ============================================
+// SUPABASE + SLEEPER CONFIG
+// ============================================
+const SUPABASE_URL = 'https://ddlypehvxaftkxzujkqy.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkbHlwZWh2eGFmdGt4enVqa3F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTQ2ODAsImV4cCI6MjA4OTM3MDY4MH0.dtKQE9d4hAitu-ZM715NEjvYVfTRhPNcRdQlNTyh83Q';
+const SLEEPER_LEAGUE_ID = '1302933004313710592';
+const SLEEPER_API = 'https://api.sleeper.app/v1';
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================
+// APP STATE
+// ============================================
+let currentUser = null;
+let currentManager = null;
+let allManagers = [];
+let rankings = [];
+let bets = [];
+let sleeperRosters = [];
+let sleeperUsers = [];
+let sleeperMatchupsCache = {};
+
+// ============================================
+// DATA LOADING
+// ============================================
+async function loadManagers() {
+  const { data } = await sb.from('managers').select('*').order('faab_balance', { ascending: false });
+  allManagers = data || [];
+}
+
+async function loadManager() {
+  if (!currentUser) return;
+  const { data } = await sb.from('managers').select('*').eq('auth_id', currentUser.id).maybeSingle();
+  currentManager = data;
+}
+
+async function loadRankings() {
+  const { data } = await sb.from('power_rankings').select('*').order('season', { ascending: false }).order('created_at', { ascending: false });
+  rankings = data || [];
+}
+
+async function loadBets() {
+  const { data } = await sb.from('bets').select('*').order('created_at', { ascending: false });
+  bets = data || [];
+}
+
+function getManager(id) {
+  return allManagers.find(m => m.id === id) || { display_name: 'Unknown', team_name: 'Unknown', faab_balance: 0 };
+}
+
+// ============================================
+// SLEEPER API
+// ============================================
+async function fetchSleeperRosters() {
+  const res = await fetch(`${SLEEPER_API}/league/${SLEEPER_LEAGUE_ID}/rosters`);
+  return res.json();
+}
+
+async function fetchSleeperUsers() {
+  const res = await fetch(`${SLEEPER_API}/league/${SLEEPER_LEAGUE_ID}/users`);
+  return res.json();
+}
+
+async function fetchSleeperMatchups(week) {
+  if (sleeperMatchupsCache[week]) return sleeperMatchupsCache[week];
+  const res = await fetch(`${SLEEPER_API}/league/${SLEEPER_LEAGUE_ID}/matchups/${week}`);
+  const data = await res.json();
+  sleeperMatchupsCache[week] = data;
+  return data;
+}
+
+async function fetchNFLState() {
+  const res = await fetch(`${SLEEPER_API}/state/nfl`);
+  return res.json();
+}
+
+async function fetchSleeperLeague() {
+  const res = await fetch(`${SLEEPER_API}/league/${SLEEPER_LEAGUE_ID}`);
+  return res.json();
+}
+
+// ============================================
+// ALGORITHM: Power Score Calculation
+// ============================================
+async function calculatePowerScores() {
+  // Fetch Sleeper data
+  const [rosters, users, league, nflState] = await Promise.all([
+    fetchSleeperRosters(),
+    fetchSleeperUsers(),
+    fetchSleeperLeague(),
+    fetchNFLState()
+  ]);
+
+  sleeperRosters = rosters;
+  sleeperUsers = users;
+
+  const currentWeek = nflState.week || 0;
+  const waiverBudget = league.settings?.waiver_budget || 1000;
+
+  // Build roster → manager map
+  const rosterToManager = {};
+  rosters.forEach(r => {
+    const mgr = allManagers.find(m => m.sleeper_user_id === r.owner_id);
+    if (mgr) rosterToManager[r.roster_id] = mgr;
+  });
+
+  // Calculate total points scored across all weeks
+  let totalPointsByRoster = {};
+  for (let w = 1; w <= Math.max(currentWeek, 1); w++) {
+    try {
+      const weekMatchups = await fetchSleeperMatchups(w);
+      weekMatchups.forEach(m => {
+        if (!totalPointsByRoster[m.roster_id]) totalPointsByRoster[m.roster_id] = 0;
+        totalPointsByRoster[m.roster_id] += (m.points || 0);
+      });
+    } catch (e) { /* week not available */ }
+  }
+
+  // Build scores per manager
+  const scores = allManagers.map(mgr => {
+    const roster = rosters.find(r => r.owner_id === mgr.sleeper_user_id);
+    if (!roster) return { manager: mgr, powerScore: 0, stats: {} };
+
+    const wins = roster.settings?.wins || 0;
+    const losses = roster.settings?.losses || 0;
+    const totalGames = wins + losses;
+    const winPct = totalGames > 0 ? wins / totalGames : 0.5;
+
+    const faabRemaining = waiverBudget - (roster.settings?.waiver_budget_used || 0);
+    const faabPct = faabRemaining / waiverBudget;
+
+    const totalPoints = totalPointsByRoster[roster.roster_id] || 0;
+    const rosterSize = (roster.players || []).length;
+
+    // Betting P/L
+    const mgrBets = bets.filter(b => b.manager_id === mgr.id);
+    const betWins = mgrBets.filter(b => b.result === 'won').length;
+    const betLosses = mgrBets.filter(b => b.result === 'lost').length;
+    const bettingPL = mgr.faab_balance - (mgr.sleeper_faab || waiverBudget);
+
+    // Normalize factors (0-100 scale)
+    const faabScore = faabPct * 100;
+    const winScore = winPct * 100;
+    // Points: normalize against max in league
+    const rosterScore = Math.min(rosterSize / 20 * 100, 100); // 20 players = 100
+
+    // Weighted composite (points will be normalized after we have all scores)
+    return {
+      manager: mgr,
+      roster,
+      powerScore: 0, // calculated after normalization
+      rawPoints: totalPoints,
+      stats: {
+        wins,
+        losses,
+        winPct: Math.round(winPct * 1000) / 10,
+        totalPoints: Math.round(totalPoints * 10) / 10,
+        faabRemaining,
+        faabPct: Math.round(faabPct * 100),
+        rosterSize,
+        betRecord: `${betWins}-${betLosses}`,
+        bettingPL,
+        faabScore,
+        winScore,
+        rosterScore
+      }
+    };
+  });
+
+  // Normalize points across the league
+  const maxPoints = Math.max(...scores.map(s => s.rawPoints), 1);
+
+  scores.forEach(s => {
+    const pointsScore = (s.rawPoints / maxPoints) * 100;
+
+    // Betting P/L normalize (-100 to +100 range)
+    const bettingScore = Math.max(Math.min(s.stats.bettingPL * 0.05 + 50, 100), 0);
+
+    // Weighted composite
+    s.powerScore = Math.round(
+      s.stats.faabScore * 0.25 +
+      pointsScore * 0.25 +
+      s.stats.winScore * 0.20 +
+      bettingScore * 0.15 +
+      s.stats.rosterScore * 0.15
+    );
+    s.stats.pointsScore = Math.round(pointsScore);
+    s.stats.bettingScore = Math.round(bettingScore);
+  });
+
+  // Sort by power score descending
+  scores.sort((a, b) => b.powerScore - a.powerScore);
+
+  return scores;
+}
+
+// ============================================
+// RENDER: Rankings
+// ============================================
+function renderRankings() {
+  const container = document.getElementById('rankings-container');
+  const selector = document.getElementById('rankings-week-select');
+
+  // Get unique week labels
+  const weekLabels = [...new Set(rankings.map(r => r.week_label))];
+
+  // Populate week selector
+  selector.innerHTML = '<option value="latest">Latest</option>' +
+    weekLabels.map(w => `<option value="${w}">${w}</option>`).join('');
+
+  const selectedWeek = selector.value;
+  let displayRankings;
+
+  if (selectedWeek === 'latest' && weekLabels.length > 0) {
+    displayRankings = rankings.filter(r => r.week_label === weekLabels[0]);
+  } else if (selectedWeek !== 'latest') {
+    displayRankings = rankings.filter(r => r.week_label === selectedWeek);
+  } else {
+    displayRankings = [];
+  }
+
+  if (displayRankings.length === 0) {
+    // No published rankings — show algorithm-only view
+    container.innerHTML = `
+      <div style="text-align:center; padding:40px; color:var(--text-muted);">
+        <div style="font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; margin-bottom:8px; color:var(--text-secondary);">No Rankings Published Yet</div>
+        <div style="font-size:0.9rem;">The Commissioner hasn't dropped the first poll.${currentManager?.is_commissioner ? ' Use the panel above to publish.' : ' Check back soon.'}</div>
+      </div>`;
+    // Still try to show algo rankings
+    showAlgorithmRankings();
+    return;
+  }
+
+  // Sort by rank
+  displayRankings.sort((a, b) => a.rank - b.rank);
+
+  const weekLabel = displayRankings[0]?.week_label || '';
+
+  container.innerHTML = `
+    <div style="margin-bottom:20px;">
+      <div style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:4px;">Commissioner's Poll — ${weekLabel}</div>
+      <div style="font-size:0.75rem; color:var(--text-muted);">Published ${new Date(displayRankings[0].created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+    </div>
+  ` + displayRankings.map((r, i) => {
+    const mgr = getManager(r.manager_id);
+    const movement = r.prev_rank ? r.prev_rank - r.rank : 0;
+    let movementHtml = '<span class="rank-movement same">—</span>';
+    if (movement > 0) movementHtml = `<span class="rank-movement up">▲${movement}</span>`;
+    else if (movement < 0) movementHtml = `<span class="rank-movement down">▼${Math.abs(movement)}</span>`;
+
+    return `
+      <div class="ranking-entry ${r.rank <= 3 ? 'top-3' : ''}">
+        <div class="rank-badge">
+          <div class="rank-number">${r.rank}</div>
+          ${movementHtml}
+        </div>
+        <div class="rank-details">
+          <div class="rank-top-row">
+            <div>
+              <div class="rank-team-name">${mgr.team_name}</div>
+              <div class="rank-manager">${mgr.display_name}</div>
+            </div>
+            <div class="rank-score">$${mgr.faab_balance?.toLocaleString() || '—'}</div>
+          </div>
+          <div class="rank-stats">
+            <div class="rank-stat"><span class="rank-stat-label">FAAB</span> <span class="rank-stat-value">$${mgr.faab_balance?.toLocaleString() || '—'}</span></div>
+          </div>
+          ${r.blurb ? `<div class="rank-blurb">${r.blurb}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function showAlgorithmRankings() {
+  const container = document.getElementById('rankings-container');
+
+  try {
+    const scores = await calculatePowerScores();
+
+    if (scores.length === 0) return;
+
+    container.innerHTML = `
+      <div style="margin-bottom:20px;">
+        <div style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:4px;">Algorithm Rankings <span style="font-size:0.7rem;color:var(--accent-portal-glow);background:rgba(99,102,241,0.15);padding:2px 8px;border-radius:3px;margin-left:8px;">AUTO-GENERATED</span></div>
+        <div style="font-size:0.75rem; color:var(--text-muted);">These are computed from Sleeper data. The Commissioner's published poll may differ.</div>
+      </div>
+    ` + scores.map((s, i) => `
+      <div class="ranking-entry ${i < 3 ? 'top-3' : ''}">
+        <div class="rank-badge">
+          <div class="rank-number">${i + 1}</div>
+          <span class="rank-movement same">—</span>
+        </div>
+        <div class="rank-details">
+          <div class="rank-top-row">
+            <div>
+              <div class="rank-team-name">${s.manager.team_name}</div>
+              <div class="rank-manager">${s.manager.display_name}</div>
+            </div>
+            <div class="rank-score">${s.powerScore} PWR</div>
+          </div>
+          <div class="rank-stats">
+            <div class="rank-stat"><span class="rank-stat-label">Record</span> <span class="rank-stat-value">${s.stats.wins}-${s.stats.losses}</span></div>
+            <div class="rank-stat"><span class="rank-stat-label">PF</span> <span class="rank-stat-value">${s.stats.totalPoints}</span></div>
+            <div class="rank-stat"><span class="rank-stat-label">FAAB</span> <span class="rank-stat-value">$${s.stats.faabRemaining}</span></div>
+            <div class="rank-stat"><span class="rank-stat-label">Bets</span> <span class="rank-stat-value">${s.stats.betRecord}</span></div>
+            <div class="rank-stat"><span class="rank-stat-label">Roster</span> <span class="rank-stat-value">${s.stats.rosterSize}</span></div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    // Update superlatives
+    renderSuperlatives(scores);
+  } catch (e) {
+    console.error('Algorithm rankings failed:', e);
+  }
+}
+
+function renderSuperlatives(scores) {
+  const container = document.getElementById('superlatives-container');
+  if (!scores || scores.length === 0) return;
+
+  const topScorer = [...scores].sort((a, b) => b.stats.totalPoints - a.stats.totalPoints)[0];
+  const mostFaab = [...scores].sort((a, b) => b.stats.faabRemaining - a.stats.faabRemaining)[0];
+  const bestRecord = [...scores].sort((a, b) => b.stats.winPct - a.stats.winPct)[0];
+  const biggestRoster = [...scores].sort((a, b) => b.stats.rosterSize - a.stats.rosterSize)[0];
+
+  container.innerHTML = `
+    <div class="top-perf-row">
+      <div>
+        <div class="top-perf-label">Top Power Score</div>
+        <div>${scores[0]?.manager.team_name || '—'}</div>
+      </div>
+      <div class="top-perf-value">${scores[0]?.powerScore || '—'} PWR</div>
+    </div>
+    <div class="top-perf-row">
+      <div>
+        <div class="top-perf-label">Highest Scorer</div>
+        <div>${topScorer?.manager.team_name || '—'}</div>
+      </div>
+      <div class="top-perf-value">${topScorer?.stats.totalPoints || '—'} pts</div>
+    </div>
+    <div class="top-perf-row">
+      <div>
+        <div class="top-perf-label">FAAB King</div>
+        <div>${mostFaab?.manager.team_name || '—'}</div>
+      </div>
+      <div class="top-perf-value">$${mostFaab?.stats.faabRemaining || '—'}</div>
+    </div>
+    <div class="top-perf-row">
+      <div>
+        <div class="top-perf-label">Best Record</div>
+        <div>${bestRecord?.manager.team_name || '—'}</div>
+      </div>
+      <div class="top-perf-value">${bestRecord?.stats.wins}-${bestRecord?.stats.losses}</div>
+    </div>
+    <div class="top-perf-row">
+      <div>
+        <div class="top-perf-label">Deepest Bench</div>
+        <div>${biggestRoster?.manager.team_name || '—'}</div>
+      </div>
+      <div class="top-perf-value">${biggestRoster?.stats.rosterSize} players</div>
+    </div>`;
+}
+
+// ============================================
+// COMMISSIONER: Rankings Editor
+// ============================================
+function toggleCommishPanel() {
+  const body = document.getElementById('commish-body');
+  const toggle = document.getElementById('commish-toggle');
+  body.classList.toggle('open');
+  toggle.textContent = body.classList.contains('open') ? 'COLLAPSE' : 'EXPAND';
+}
+
+async function generateAlgoRankings() {
+  const container = document.getElementById('rank-editor-container');
+  container.innerHTML = '<div style="color:var(--text-muted);font-size:0.82rem;">Calculating...</div>';
+
+  try {
+    const scores = await calculatePowerScores();
+
+    // Get previous rankings for movement
+    const prevWeekLabels = [...new Set(rankings.map(r => r.week_label))];
+    const prevRankings = prevWeekLabels.length > 0
+      ? rankings.filter(r => r.week_label === prevWeekLabels[0])
+      : [];
+
+    container.innerHTML = scores.map((s, i) => {
+      const prevRank = prevRankings.find(r => r.manager_id === s.manager.id);
+      return `
+        <div class="rank-editor-row" data-manager-id="${s.manager.id}">
+          <input type="number" class="rank-input" value="${i + 1}" min="1" max="${scores.length}">
+          <div>
+            <div class="rank-editor-name">${s.manager.team_name}</div>
+            <div class="rank-editor-manager">${s.manager.display_name} &middot; ${s.powerScore} PWR${prevRank ? ' &middot; prev #' + prevRank.rank : ''}</div>
+          </div>
+          <textarea class="rank-blurb-input" placeholder="Commissioner's blurb (optional)">${''}</textarea>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    container.innerHTML = '<div style="color:var(--accent-red);font-size:0.82rem;">Error: ' + e.message + '</div>';
+  }
+}
+
+async function publishRankings() {
+  const label = document.getElementById('rankings-label-input').value.trim();
+  const msg = document.getElementById('rankings-publish-msg');
+
+  if (!label) { msg.textContent = 'Enter a label (e.g. "Post-Auction")'; msg.className = 'commish-msg error'; return; }
+
+  const rows = document.querySelectorAll('.rank-editor-row');
+  if (rows.length === 0) { msg.textContent = 'Generate rankings first'; msg.className = 'commish-msg error'; return; }
+
+  // Get previous rankings for movement tracking
+  const prevWeekLabels = [...new Set(rankings.map(r => r.week_label))];
+  const prevRankings = prevWeekLabels.length > 0
+    ? rankings.filter(r => r.week_label === prevWeekLabels[0])
+    : [];
+
+  const entries = [];
+  rows.forEach(row => {
+    const managerId = row.dataset.managerId;
+    const rank = parseInt(row.querySelector('.rank-input').value);
+    const blurb = row.querySelector('.rank-blurb-input').value.trim();
+    const prevRank = prevRankings.find(r => r.manager_id === managerId);
+
+    entries.push({
+      manager_id: managerId,
+      week_label: label,
+      season: 2026,
+      rank,
+      prev_rank: prevRank?.rank || null,
+      blurb: blurb || null
+    });
+  });
+
+  // Delete existing rankings for this label (upsert)
+  await sb.from('power_rankings').delete().eq('week_label', label).eq('season', 2026);
+
+  const { error } = await sb.from('power_rankings').insert(entries);
+
+  if (error) { msg.textContent = 'Error: ' + error.message; msg.className = 'commish-msg error'; return; }
+
+  msg.textContent = 'Rankings published for "' + label + '"!';
+  msg.className = 'commish-msg';
+
+  await loadRankings();
+  renderRankings();
+}
+
+function changeRankingsWeek() {
+  renderRankings();
+}
+
+// ============================================
+// INIT
+// ============================================
+(async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    currentUser = session.user;
+    await loadManager();
+  }
+
+  await Promise.all([loadManagers(), loadRankings(), loadBets()]);
+
+  // Show commissioner panel
+  if (currentManager?.is_commissioner) {
+    document.getElementById('commish-panel').classList.add('visible');
+  }
+
+  // Render rankings (published or algorithm)
+  renderRankings();
+})();
+</script>
+
+</body>
+</html>

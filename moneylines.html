@@ -206,12 +206,48 @@
   .commish-week-nav { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; }
   .commish-week-nav span { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent-portal-glow); }
 
+  /* SIDE ACTION */
+  .side-action { margin-top: 48px; }
+  .side-action-header { font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; font-weight: 700; padding-bottom: 12px; border-bottom: 2px solid var(--accent-orange); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+  .side-action-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--accent-orange); background: rgba(245, 158, 11, 0.12); padding: 3px 10px; border-radius: 3px; letter-spacing: 1px; }
+  .side-bet-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+  .side-bet-card.resolved { opacity: 0.7; }
+  .side-bet-header { padding: 16px 20px 8px; }
+  .side-bet-title { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+  .side-bet-desc { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 4px; }
+  .side-bet-meta { font-size: 0.65rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; }
+  .side-bet-options { padding: 8px 20px 16px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .side-bet-option { flex: 1; min-width: 120px; background: var(--bg-accent); border: 1px solid var(--border-light); border-radius: 6px; padding: 12px 16px; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .side-bet-option:hover { border-color: var(--accent-orange); background: rgba(245, 158, 11, 0.06); }
+  .side-bet-option.winner { border-color: var(--accent-green); background: rgba(34, 197, 94, 0.08); }
+  .side-bet-option.user-picked { border-color: var(--accent-gold); background: rgba(201, 168, 76, 0.12); box-shadow: 0 0 12px rgba(201, 168, 76, 0.1); }
+  .side-bet-option .option-label { font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; }
+  .side-bet-option .option-odds { font-family: 'JetBrains Mono', monospace; font-size: 1rem; }
+  .side-bet-option .option-odds.fav { color: var(--accent-green); }
+  .side-bet-option .option-odds.dog { color: var(--accent-red); }
+  .side-bet-slip { display: none; padding: 12px 20px 16px; background: var(--bg-accent); border-top: 1px solid var(--border); }
+  .side-bet-slip.active { display: block; }
+  .side-bet-slip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.8rem; }
+  .side-bet-wagers { padding: 8px 20px 12px; font-size: 0.72rem; color: var(--text-muted); border-top: 1px solid var(--border); }
+  .side-bet-wager-entry { display: flex; justify-content: space-between; padding: 4px 0; }
+  .side-bet-wager-entry .winner { color: var(--accent-green); }
+  .side-bet-wager-entry .loser { color: var(--accent-red); }
+
+  /* COMMISH: Side Action Creator */
+  .commish-side-action-form { background: var(--bg-accent); border: 1px solid var(--border-light); border-radius: 6px; padding: 16px; margin-top: 12px; }
+  .commish-side-action-form input, .commish-side-action-form textarea { width: 100%; background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: 4px; padding: 8px 12px; color: var(--text-primary); font-size: 0.85rem; margin-bottom: 8px; font-family: 'Inter', sans-serif; }
+  .commish-side-action-form textarea { resize: vertical; min-height: 60px; }
+  .commish-side-action-form input:focus, .commish-side-action-form textarea:focus { outline: none; border-color: var(--accent-portal); }
+  .commish-option-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+  .commish-option-row input { margin-bottom: 0; }
+
   @media (max-width: 900px) {
     .moneyline-grid { grid-template-columns: 1fr; }
     .matchup-teams-row { grid-template-columns: 1fr; gap: 8px; }
     .team-side.away, .team-side.home { text-align: center; }
     .balance-bar { flex-direction: column; text-align: center; }
     .auth-bar { flex-direction: column; text-align: center; }
+    .side-bet-options { flex-direction: column; }
   }
 </style>
 </head>
@@ -235,7 +271,7 @@
     <a href="index.html">Home</a>
     <a href="#">Articles</a>
     <a href="#" class="active">Moneylines</a>
-    <a href="#">Power Rankings</a>
+    <a href="powerrankings.html">Power Rankings</a>
     <a href="#">Teams</a>
     <a href="#">The Multiverse</a>
     <a href="#">League Lore</a>
@@ -353,6 +389,40 @@
         </div>
       </div>
 
+      <!-- SIDE ACTION: Create / Settle Prop Bets -->
+      <div class="commish-section" id="commish-side-action">
+        <h3>Side Action</h3>
+        <p style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:12px;">Create prop bets for the league — draft picks, trash talk, preseason predictions. Anything goes.</p>
+        <button class="commish-btn" onclick="toggleSideActionForm()">+ New Side Bet</button>
+        <div class="commish-side-action-form" id="side-action-form" style="display:none;">
+          <input type="text" id="side-bet-title" placeholder="Bet title (e.g. &quot;Who goes 1.01?&quot;)">
+          <textarea id="side-bet-desc" placeholder="Description / context (optional)"></textarea>
+          <input type="text" id="side-bet-week-label" placeholder="Label (e.g. &quot;Draft Night&quot;, &quot;Preseason&quot;, &quot;Week 3&quot;)">
+          <div style="margin-bottom:8px;">
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;">Options (at least 2):</div>
+            <div id="side-bet-options-list">
+              <div class="commish-option-row">
+                <input type="text" placeholder="Option label" style="flex:2;" class="side-opt-label">
+                <input type="number" placeholder="Odds (e.g. -150)" style="flex:1;" class="side-opt-odds">
+              </div>
+              <div class="commish-option-row">
+                <input type="text" placeholder="Option label" style="flex:2;" class="side-opt-label">
+                <input type="number" placeholder="Odds (e.g. +130)" style="flex:1;" class="side-opt-odds">
+              </div>
+            </div>
+            <button class="commish-btn" onclick="addSideOptionRow()" style="font-size:0.7rem;padding:4px 12px;margin-top:4px;">+ Add Option</button>
+          </div>
+          <div class="commish-btn-row">
+            <button class="commish-btn success" onclick="createSideBet()">Create Bet</button>
+          </div>
+          <div class="commish-msg" id="side-action-create-msg"></div>
+        </div>
+        <div style="margin-top:16px;">
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;">Open Side Bets (settle from here):</div>
+          <div id="commish-side-bets-list"><span style="font-size:0.78rem;color:var(--text-muted);font-style:italic;">Loading...</span></div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -399,6 +469,17 @@
       </div>
 
     </aside>
+  </div>
+
+  <!-- SIDE ACTION: Prop Bets -->
+  <div class="side-action" id="side-action-section">
+    <div class="side-action-header">
+      <span>Side Action</span>
+      <span class="side-action-badge">PROP BETS</span>
+    </div>
+    <div id="side-action-container">
+      <div style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic; font-size:0.85rem;">No side action yet. The Commissioner hasn't posted any props.</div>
+    </div>
   </div>
 </div>
 
@@ -1299,6 +1380,269 @@ async function autoSettleFromSleeper() {
 }
 
 // ============================================
+// SIDE ACTION: Prop Bets
+// ============================================
+let sideBets = [];
+let sideWagers = [];
+
+async function loadSideBets() {
+  const { data: sb_data } = await sb.from('side_bets').select('*').order('created_at', { ascending: false });
+  sideBets = sb_data || [];
+  const { data: sw_data } = await sb.from('side_bet_wagers').select('*').order('created_at', { ascending: false });
+  sideWagers = sw_data || [];
+}
+
+function toggleSideActionForm() {
+  const form = document.getElementById('side-action-form');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function addSideOptionRow() {
+  const list = document.getElementById('side-bet-options-list');
+  const row = document.createElement('div');
+  row.className = 'commish-option-row';
+  row.innerHTML = '<input type="text" placeholder="Option label" style="flex:2;" class="side-opt-label"><input type="number" placeholder="Odds (e.g. +200)" style="flex:1;" class="side-opt-odds">';
+  list.appendChild(row);
+}
+
+async function createSideBet() {
+  const title = document.getElementById('side-bet-title').value.trim();
+  const desc = document.getElementById('side-bet-desc').value.trim();
+  const weekLabel = document.getElementById('side-bet-week-label').value.trim() || 'Preseason';
+  const msg = document.getElementById('side-action-create-msg');
+
+  if (!title) { msg.textContent = 'Title is required'; msg.className = 'commish-msg error'; return; }
+
+  const labels = document.querySelectorAll('.side-opt-label');
+  const oddses = document.querySelectorAll('.side-opt-odds');
+  const options = [];
+  for (let i = 0; i < labels.length; i++) {
+    const label = labels[i].value.trim();
+    const odds = parseInt(oddses[i].value);
+    if (label && odds) options.push({ label, odds });
+  }
+
+  if (options.length < 2) { msg.textContent = 'Need at least 2 options with odds'; msg.className = 'commish-msg error'; return; }
+
+  const { error } = await sb.from('side_bets').insert({
+    created_by: currentManager.id,
+    title,
+    description: desc || null,
+    options,
+    week_label: weekLabel,
+    status: 'open'
+  });
+
+  if (error) { msg.textContent = 'Error: ' + error.message; msg.className = 'commish-msg error'; return; }
+
+  msg.textContent = 'Side bet created!';
+  msg.className = 'commish-msg';
+  document.getElementById('side-bet-title').value = '';
+  document.getElementById('side-bet-desc').value = '';
+  document.getElementById('side-action-form').style.display = 'none';
+
+  await loadSideBets();
+  renderSideAction();
+  renderCommishSideBets();
+}
+
+function renderCommishSideBets() {
+  const container = document.getElementById('commish-side-bets-list');
+  const openBets = sideBets.filter(b => b.status === 'open' || b.status === 'locked');
+
+  if (openBets.length === 0) {
+    container.innerHTML = '<span style="font-size:0.78rem;color:var(--text-muted);font-style:italic;">No open side bets.</span>';
+    return;
+  }
+
+  container.innerHTML = openBets.map(bet => {
+    const opts = bet.options || [];
+    const wagerCount = sideWagers.filter(w => w.side_bet_id === bet.id).length;
+    return `
+      <div class="commish-matchup-card">
+        <div style="font-weight:600;font-size:0.85rem;margin-bottom:6px;">${bet.title}</div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:8px;">${wagerCount} wager(s) placed &middot; ${bet.week_label}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+          ${opts.map(o => `<span style="font-size:0.75rem;background:var(--bg-primary);padding:4px 10px;border-radius:4px;border:1px solid var(--border-light);">${o.label} (${formatOdds(o.odds)})</span>`).join('')}
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${opts.map(o => `<button class="commish-btn" onclick="settleSideBet('${bet.id}','${o.label}')" style="font-size:0.7rem;padding:4px 12px;">Settle: ${o.label} wins</button>`).join('')}
+          <button class="commish-btn danger" onclick="voidSideBet('${bet.id}')" style="font-size:0.7rem;padding:4px 12px;">Void</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function settleSideBet(betId, winningOption) {
+  if (!confirm('Settle this bet? Winner: ' + winningOption)) return;
+
+  const { error } = await sb.rpc('settle_side_bet', {
+    p_side_bet_id: betId,
+    p_winning_option: winningOption
+  });
+
+  if (error) { alert('Error: ' + error.message); return; }
+
+  await loadSideBets();
+  await loadManager();
+  await loadManagers();
+  renderSideAction();
+  renderCommishSideBets();
+  renderLeaderboard();
+  updateBalance();
+}
+
+async function voidSideBet(betId) {
+  if (!confirm('Void this bet? All wagers will be returned.')) return;
+
+  // Get all pending wagers for this bet
+  const betWagers = sideWagers.filter(w => w.side_bet_id === betId && w.result === 'pending');
+
+  // Return FAAB to each bettor
+  for (const w of betWagers) {
+    await sb.from('managers').update({
+      faab_balance: allManagers.find(m => m.id === w.manager_id).faab_balance + w.amount
+    }).eq('id', w.manager_id);
+
+    await sb.from('side_bet_wagers').update({ result: 'voided' }).eq('id', w.id);
+  }
+
+  await sb.from('side_bets').update({ status: 'voided' }).eq('id', betId);
+
+  await loadSideBets();
+  await loadManager();
+  await loadManagers();
+  renderSideAction();
+  renderCommishSideBets();
+  renderLeaderboard();
+  updateBalance();
+}
+
+// PUBLIC: Render side action for all users
+function renderSideAction() {
+  const container = document.getElementById('side-action-container');
+
+  if (sideBets.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-style:italic; font-size:0.85rem;">No side action yet. The Commissioner hasn\'t posted any props.</div>';
+    return;
+  }
+
+  container.innerHTML = sideBets.map(bet => {
+    const opts = bet.options || [];
+    const betWagers = sideWagers.filter(w => w.side_bet_id === bet.id);
+    const myWagers = currentManager ? betWagers.filter(w => w.manager_id === currentManager.id) : [];
+    const isOpen = bet.status === 'open';
+    const isResolved = bet.status === 'resolved';
+
+    return `
+      <div class="side-bet-card ${isResolved ? 'resolved' : ''}">
+        <div class="side-bet-header">
+          <div class="side-bet-title">${bet.title}</div>
+          ${bet.description ? `<div class="side-bet-desc">${bet.description}</div>` : ''}
+          <div class="side-bet-meta">${bet.week_label} &middot; ${bet.status.toUpperCase()}${isResolved && bet.winning_option ? ' &middot; Winner: ' + bet.winning_option : ''}</div>
+        </div>
+        <div class="side-bet-options">
+          ${opts.map(o => {
+            const myPick = myWagers.find(w => w.option_picked === o.label);
+            const isWinner = isResolved && bet.winning_option === o.label;
+            return `
+              <div class="side-bet-option ${isWinner ? 'winner' : ''} ${myPick ? 'user-picked' : ''}"
+                ${isOpen && currentManager && !myPick ? `onclick="openSideBetSlip('${bet.id}','${o.label.replace(/'/g, "\\'")}',${o.odds})"` : ''}
+                style="${!isOpen && !myPick && !isWinner ? 'opacity:0.5;cursor:default;' : ''}${isOpen && currentManager && !myPick ? 'cursor:pointer;' : ''}">
+                <div class="option-label">${o.label}${isWinner ? ' ✓' : ''}</div>
+                <div class="option-odds ${o.odds < 0 ? 'fav' : 'dog'}">${formatOdds(o.odds)}</div>
+                ${myPick ? `<div style="font-size:0.65rem;color:var(--accent-gold);margin-top:4px;">Your bet: $${myPick.amount}${myPick.result === 'won' ? ' — WON +$' + myPick.payout : myPick.result === 'lost' ? ' — LOST' : ''}</div>` : ''}
+              </div>`;
+          }).join('')}
+        </div>
+        <div class="side-bet-slip" id="side-slip-${bet.id}">
+          <div class="side-bet-slip-header">
+            <span><strong id="side-pick-label-${bet.id}"></strong></span>
+            <span style="font-family:'JetBrains Mono',monospace;color:var(--accent-orange);" id="side-pick-odds-${bet.id}"></span>
+          </div>
+          <div class="bet-input-row">
+            <label>Wager:</label>
+            <input type="number" class="bet-input" id="side-wager-${bet.id}" placeholder="$0" min="1" oninput="updateSidePayout('${bet.id}')">
+            <span class="bet-payout" id="side-payout-${bet.id}">Win: $0</span>
+          </div>
+          <button class="place-bet-btn" style="background:linear-gradient(135deg, var(--accent-orange), #d48806);" onclick="placeSideBet('${bet.id}')">Place Side Bet</button>
+          <div class="bet-confirmation" id="side-confirm-${bet.id}"></div>
+        </div>
+        ${betWagers.length > 0 ? `
+          <div class="side-bet-wagers">
+            <div style="margin-bottom:4px;font-weight:600;color:var(--text-secondary);">Action (${betWagers.length})</div>
+            ${betWagers.slice(0, 10).map(w => {
+              const mgr = getManager(w.manager_id);
+              return `<div class="side-bet-wager-entry">
+                <span>${mgr.display_name} → ${w.option_picked}</span>
+                <span class="${w.result === 'won' ? 'winner' : w.result === 'lost' ? 'loser' : ''}">$${w.amount}${w.result === 'won' ? ' +$' + w.payout : w.result === 'lost' ? ' ✗' : ''}</span>
+              </div>`;
+            }).join('')}
+          </div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+let activeSideBet = { betId: null, option: '', odds: 0 };
+
+function openSideBetSlip(betId, option, odds) {
+  if (!currentManager) { alert('Sign in to place bets'); return; }
+
+  // Close all side slips
+  document.querySelectorAll('.side-bet-slip').forEach(s => s.classList.remove('active'));
+
+  const slip = document.getElementById('side-slip-' + betId);
+  slip.classList.add('active');
+  document.getElementById('side-pick-label-' + betId).textContent = option;
+  document.getElementById('side-pick-odds-' + betId).textContent = formatOdds(odds);
+
+  activeSideBet = { betId, option, odds };
+
+  const input = document.getElementById('side-wager-' + betId);
+  input.value = '';
+  input.focus();
+  document.getElementById('side-payout-' + betId).textContent = 'Win: $0';
+  document.getElementById('side-confirm-' + betId).textContent = '';
+}
+
+function updateSidePayout(betId) {
+  const wager = parseInt(document.getElementById('side-wager-' + betId).value) || 0;
+  const payout = calculatePayout(wager, activeSideBet.odds);
+  document.getElementById('side-payout-' + betId).textContent = 'Win: $' + payout.toLocaleString();
+}
+
+async function placeSideBet(betId) {
+  if (!currentManager) { alert('Sign in first'); return; }
+
+  const wager = parseInt(document.getElementById('side-wager-' + betId).value);
+  const confirm = document.getElementById('side-confirm-' + betId);
+
+  if (!wager || wager < 1) { confirm.textContent = 'Minimum bet is $1'; confirm.style.color = 'var(--accent-red)'; return; }
+  if (wager > currentManager.faab_balance) { confirm.textContent = 'Insufficient FAAB ($' + currentManager.faab_balance + ' available)'; confirm.style.color = 'var(--accent-red)'; return; }
+
+  const { error } = await sb.rpc('place_side_bet', {
+    p_manager_id: currentManager.id,
+    p_side_bet_id: activeSideBet.betId,
+    p_option: activeSideBet.option,
+    p_amount: wager
+  });
+
+  if (error) {
+    confirm.textContent = error.message;
+    confirm.style.color = 'var(--accent-red)';
+  } else {
+    const payout = calculatePayout(wager, activeSideBet.odds);
+    confirm.textContent = 'Bet placed! $' + wager + ' on ' + activeSideBet.option + ' to win $' + payout;
+    confirm.style.color = 'var(--accent-green)';
+
+    await loadManager();
+    await loadSideBets();
+    updateBalance();
+    renderSideAction();
+  }
+}
+
+// ============================================
 // INIT
 // ============================================
 (async function init() {
@@ -1310,16 +1654,21 @@ async function autoSettleFromSleeper() {
 
   // Load all data first so allManagers is populated for claim dropdown + commissioner check
   await loadAll();
+  await loadSideBets();
 
   // Now update UI with full data available
   if (currentUser) {
     updateAuthUI(true);
   }
 
+  // Render side action for everyone
+  renderSideAction();
+
   // Commissioner panel logic (runs after allManagers is loaded)
   if (currentManager?.is_commissioner) {
     document.getElementById('commish-panel').classList.add('visible');
     renderCommishMatchups();
+    renderCommishSideBets();
   } else if (currentUser && allManagers.length === 0) {
     // First user, no managers yet — show setup
     document.getElementById('commish-panel').classList.add('visible');
