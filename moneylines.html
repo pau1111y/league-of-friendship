@@ -253,8 +253,10 @@
   <div class="auth-bar" id="auth-bar">
     <div id="auth-logged-out">
       <div class="auth-form">
-        <input type="email" class="auth-input" id="auth-email" placeholder="Enter your email to sign in">
-        <button class="auth-btn" id="auth-submit">Send Magic Link</button>
+        <input type="email" class="auth-input" id="auth-email" placeholder="Email">
+        <input type="password" class="auth-input" id="auth-password" placeholder="Password" style="min-width:160px;">
+        <button class="auth-btn" id="auth-signin">Sign In</button>
+        <button class="auth-btn secondary" id="auth-signup">Sign Up</button>
       </div>
       <div class="auth-msg" id="auth-msg"></div>
     </div>
@@ -419,23 +421,41 @@ let bets = [];
 // ============================================
 // AUTH
 // ============================================
-document.getElementById('auth-submit').addEventListener('click', async () => {
+document.getElementById('auth-signin').addEventListener('click', async () => {
   const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
   const msg = document.getElementById('auth-msg');
-  if (!email) { msg.textContent = 'Enter your email'; msg.className = 'auth-msg error'; return; }
+  if (!email || !password) { msg.textContent = 'Enter email and password'; msg.className = 'auth-msg error'; return; }
 
-  const { error } = await sb.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: window.location.href }
-  });
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    msg.textContent = error.message;
+    msg.className = 'auth-msg error';
+  }
+});
+
+document.getElementById('auth-signup').addEventListener('click', async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const msg = document.getElementById('auth-msg');
+  if (!email || !password) { msg.textContent = 'Enter email and password'; msg.className = 'auth-msg error'; return; }
+  if (password.length < 6) { msg.textContent = 'Password must be at least 6 characters'; msg.className = 'auth-msg error'; return; }
+
+  const { error } = await sb.auth.signUp({ email, password });
 
   if (error) {
     msg.textContent = error.message;
     msg.className = 'auth-msg error';
   } else {
-    msg.textContent = 'Magic link sent! Check your email.';
+    msg.textContent = 'Account created! You are now signed in.';
     msg.className = 'auth-msg';
   }
+});
+
+// Enter key on password field triggers sign-in
+document.getElementById('auth-password').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('auth-signin').click();
 });
 
 document.getElementById('auth-signout').addEventListener('click', async () => {
