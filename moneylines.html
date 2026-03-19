@@ -171,6 +171,41 @@
 
   .loading { text-align: center; padding: 40px; color: var(--text-muted); }
 
+  /* COMMISSIONER PANEL */
+  .commish-panel { background: var(--bg-card); border: 2px solid var(--accent-portal); border-radius: 8px; padding: 24px; margin-bottom: 32px; display: none; }
+  .commish-panel.visible { display: block; }
+  .commish-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; cursor: pointer; }
+  .commish-panel-header h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; font-weight: 700; color: var(--accent-portal-glow); }
+  .commish-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--accent-portal-glow); background: rgba(99, 102, 241, 0.15); padding: 3px 10px; border-radius: 3px; letter-spacing: 1px; text-transform: uppercase; }
+  .commish-body { display: none; }
+  .commish-body.open { display: block; }
+  .commish-section { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .commish-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .commish-section h3 { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 12px; }
+  .commish-btn { background: var(--accent-portal); color: white; border: none; border-radius: 4px; padding: 8px 20px; font-weight: 600; font-size: 0.78rem; cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s; }
+  .commish-btn:hover { background: var(--accent-portal-glow); }
+  .commish-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .commish-btn.danger { background: var(--accent-red); }
+  .commish-btn.success { background: var(--accent-green); }
+  .commish-btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .commish-msg { font-size: 0.78rem; color: var(--accent-green); margin-top: 8px; }
+  .commish-msg.error { color: var(--accent-red); }
+  .commish-select { background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: 4px; padding: 8px 14px; color: var(--text-primary); font-size: 0.85rem; min-width: 200px; }
+  .commish-matchup-card { background: var(--bg-accent); border: 1px solid var(--border-light); border-radius: 6px; padding: 16px; margin-bottom: 12px; }
+  .commish-matchup-teams { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .commish-team { font-weight: 600; font-size: 0.85rem; }
+  .commish-vs { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
+  .commish-line-row { display: flex; gap: 12px; align-items: center; }
+  .commish-line-input { background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: 4px; padding: 6px 10px; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; width: 80px; text-align: center; }
+  .commish-line-input:focus { outline: none; border-color: var(--accent-portal); }
+  .commish-line-label { font-size: 0.7rem; color: var(--text-muted); min-width: 80px; text-align: right; }
+  .commish-suggested { font-size: 0.65rem; color: var(--accent-portal-glow); font-style: italic; margin-top: 4px; }
+  .commish-matchup-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }
+  .commish-status-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .commish-status-select { background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: 4px; padding: 4px 8px; color: var(--text-primary); font-size: 0.75rem; }
+  .commish-week-nav { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; }
+  .commish-week-nav span { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent-portal-glow); }
+
   @media (max-width: 900px) {
     .moneyline-grid { grid-template-columns: 1fr; }
     .matchup-teams-row { grid-template-columns: 1fr; gap: 8px; }
@@ -251,6 +286,61 @@
     <div class="balance-item">
       <div class="balance-label">Season P/L</div>
       <div class="balance-value muted" id="bal-pl">$0</div>
+    </div>
+  </div>
+
+  <!-- COMMISSIONER PANEL (hidden unless logged in as commissioner) -->
+  <div class="commish-panel" id="commish-panel">
+    <div class="commish-panel-header" onclick="toggleCommishPanel()">
+      <h2>Commissioner Controls</h2>
+      <span class="commish-badge" id="commish-toggle">EXPAND</span>
+    </div>
+    <div class="commish-body" id="commish-body">
+
+      <!-- SETUP: Register as Commissioner (only if no managers exist) -->
+      <div class="commish-section" id="commish-setup" style="display:none;">
+        <h3>League Setup</h3>
+        <p style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:12px;">Select your Sleeper identity to register as Commissioner and sync all league members.</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <select class="commish-select" id="commish-sleeper-select"><option value="">Loading Sleeper users...</option></select>
+          <button class="commish-btn" onclick="registerAsCommissioner()">Register as Commissioner</button>
+        </div>
+        <div class="commish-msg" id="commish-setup-msg"></div>
+      </div>
+
+      <!-- SYNC: Pull from Sleeper -->
+      <div class="commish-section" id="commish-sync">
+        <h3>Sleeper Sync</h3>
+        <div class="commish-btn-row">
+          <button class="commish-btn" onclick="syncAllFromSleeper()">Sync All Members + FAAB</button>
+          <span class="commish-msg" id="sync-msg"></span>
+        </div>
+      </div>
+
+      <!-- MATCHUPS: Import & Set Lines -->
+      <div class="commish-section" id="commish-matchups">
+        <h3>Matchup Management</h3>
+        <div class="commish-week-nav">
+          <button class="commish-btn" onclick="changeCommishWeek(-1)" style="padding:4px 12px;">&#9664;</button>
+          <span id="commish-week-label">WEEK 1</span>
+          <button class="commish-btn" onclick="changeCommishWeek(1)" style="padding:4px 12px;">&#9654;</button>
+          <button class="commish-btn" onclick="importWeekFromSleeper()" style="margin-left:12px;">Import from Sleeper</button>
+          <button class="commish-btn success" onclick="publishAllLines()">Open Betting</button>
+        </div>
+        <div id="commish-matchup-cards">
+          <div style="color:var(--text-muted);font-size:0.82rem;font-style:italic;">Import matchups from Sleeper to get started.</div>
+        </div>
+      </div>
+
+      <!-- SETTLE: Resolve matchups -->
+      <div class="commish-section" id="commish-settle">
+        <h3>Settle Matchups</h3>
+        <div class="commish-btn-row">
+          <button class="commish-btn" onclick="autoSettleFromSleeper()">Auto-Settle from Sleeper Scores</button>
+          <span class="commish-msg" id="settle-msg"></span>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -376,6 +466,17 @@ function updateAuthUI(loggedIn) {
     document.getElementById('user-display-name').textContent = currentManager.display_name;
     document.getElementById('user-team-name').textContent = currentManager.team_name;
     document.getElementById('bal-faab').textContent = '$' + currentManager.faab_balance.toLocaleString();
+
+    // Show commissioner panel if commissioner
+    if (currentManager.is_commissioner) {
+      document.getElementById('commish-panel').classList.add('visible');
+      renderCommishMatchups();
+    }
+  }
+
+  // Hide commissioner panel when logged out
+  if (!loggedIn) {
+    document.getElementById('commish-panel').classList.remove('visible');
   }
 }
 
@@ -440,7 +541,7 @@ function renderMatchups() {
         <div class="matchup-body" style="text-align:center; padding:40px;">
           <div style="font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; margin-bottom:8px;">No Matchups Yet</div>
           <div style="color:var(--text-secondary); font-size:0.9rem;">The Commissioner hasn't published this week's lines yet. Check back soon.</div>
-          ${currentManager?.is_commissioner ? '<div style="margin-top:16px;font-size:0.8rem;color:var(--accent-gold);">You\'re the Commissioner — add matchups via the Supabase dashboard or wait for the Sleeper API integration.</div>' : ''}
+          ${currentManager?.is_commissioner ? '<div style="margin-top:16px;font-size:0.8rem;color:var(--accent-gold);">Use the Commissioner Controls above to import matchups from Sleeper and publish lines.</div>' : ''}
         </div>
       </div>`;
     return;
@@ -661,9 +762,468 @@ function updateBalance() {
   const losses = allMyBets.filter(b => b.result === 'lost').length;
   document.getElementById('bal-record').textContent = wins + '-' + losses;
 
-  const pl = currentManager.faab_balance - 1000;
+  const baseline = currentManager.sleeper_faab || 1000;
+  const pl = currentManager.faab_balance - baseline;
   document.getElementById('bal-pl').textContent = (pl >= 0 ? '+$' : '-$') + Math.abs(pl).toLocaleString();
   document.getElementById('bal-pl').className = 'balance-value ' + (pl > 0 ? 'green' : pl < 0 ? 'red' : 'muted');
+}
+
+// ============================================
+// SLEEPER API
+// ============================================
+const SLEEPER_API = 'https://api.sleeper.app/v1';
+
+async function fetchSleeperUsers() {
+  const res = await fetch(`${SLEEPER_API}/league/${SLEEPER_LEAGUE_ID}/users`);
+  return res.json();
+}
+
+async function fetchSleeperRosters() {
+  const res = await fetch(`${SLEEPER_API}/league/${SLEEPER_LEAGUE_ID}/rosters`);
+  return res.json();
+}
+
+async function fetchSleeperMatchups(week) {
+  const res = await fetch(`${SLEEPER_API}/league/${SLEEPER_LEAGUE_ID}/matchups/${week}`);
+  return res.json();
+}
+
+async function fetchNFLState() {
+  const res = await fetch(`${SLEEPER_API}/state/nfl`);
+  return res.json();
+}
+
+async function fetchSleeperLeague() {
+  const res = await fetch(`${SLEEPER_API}/league/${SLEEPER_LEAGUE_ID}`);
+  return res.json();
+}
+
+// ============================================
+// COMMISSIONER: Panel Toggle
+// ============================================
+function toggleCommishPanel() {
+  const body = document.getElementById('commish-body');
+  const toggle = document.getElementById('commish-toggle');
+  body.classList.toggle('open');
+  toggle.textContent = body.classList.contains('open') ? 'COLLAPSE' : 'EXPAND';
+}
+
+// ============================================
+// COMMISSIONER: Registration (First-Time Setup)
+// ============================================
+async function loadSleeperUsersForSetup() {
+  try {
+    const users = await fetchSleeperUsers();
+    const rosters = await fetchSleeperRosters();
+    const select = document.getElementById('commish-sleeper-select');
+    // Only show users who have a roster
+    const rosterOwners = new Set(rosters.map(r => r.owner_id));
+    const rosterUsers = users.filter(u => rosterOwners.has(u.user_id));
+    select.innerHTML = '<option value="">— Select your Sleeper account —</option>' +
+      rosterUsers.map(u => `<option value="${u.user_id}">${u.display_name}${u.metadata?.team_name ? ' (' + u.metadata.team_name + ')' : ''}</option>`).join('');
+  } catch (e) {
+    document.getElementById('commish-setup-msg').textContent = 'Failed to load Sleeper users: ' + e.message;
+    document.getElementById('commish-setup-msg').className = 'commish-msg error';
+  }
+}
+
+async function registerAsCommissioner() {
+  const select = document.getElementById('commish-sleeper-select');
+  const msg = document.getElementById('commish-setup-msg');
+  const sleeperUserId = select.value;
+  if (!sleeperUserId) { msg.textContent = 'Select your Sleeper account first'; msg.className = 'commish-msg error'; return; }
+
+  const users = await fetchSleeperUsers();
+  const user = users.find(u => u.user_id === sleeperUserId);
+  const displayName = user.display_name;
+  const teamName = user.metadata?.team_name || displayName + "'s Team";
+
+  const { data, error } = await sb.from('managers').insert({
+    auth_id: currentUser.id,
+    sleeper_user_id: sleeperUserId,
+    display_name: displayName,
+    team_name: teamName,
+    faab_balance: 1000,
+    sleeper_faab: 1000,
+    is_commissioner: true
+  }).select().single();
+
+  if (error) {
+    msg.textContent = 'Error: ' + error.message;
+    msg.className = 'commish-msg error';
+  } else {
+    msg.textContent = 'Registered as Commissioner! Now syncing all members...';
+    msg.className = 'commish-msg';
+    currentManager = data;
+    await syncAllFromSleeper();
+    await loadAll();
+    updateAuthUI(true);
+    document.getElementById('commish-setup').style.display = 'none';
+  }
+}
+
+// ============================================
+// COMMISSIONER: Sync All Members from Sleeper
+// ============================================
+async function syncAllFromSleeper() {
+  const msg = document.getElementById('sync-msg');
+  msg.textContent = 'Syncing...';
+  msg.className = 'commish-msg';
+
+  try {
+    const [users, rosters, league] = await Promise.all([
+      fetchSleeperUsers(),
+      fetchSleeperRosters(),
+      fetchSleeperLeague()
+    ]);
+
+    const waiverBudget = league.settings?.waiver_budget || 1000;
+    const rosterMap = {};
+    rosters.forEach(r => { rosterMap[r.owner_id] = r; });
+
+    let synced = 0;
+    for (const user of users) {
+      const roster = rosterMap[user.user_id];
+      if (!roster) continue; // Skip users without a roster
+
+      const sleeperFaab = waiverBudget - (roster.settings?.waiver_budget_used || 0);
+      const displayName = user.display_name;
+      const teamName = user.metadata?.team_name || displayName + "'s Team";
+
+      // Check if manager already exists
+      const existing = allManagers.find(m => m.sleeper_user_id === user.user_id);
+
+      if (existing) {
+        // Update existing manager's Sleeper data
+        await sb.from('managers').update({
+          display_name: displayName,
+          team_name: teamName,
+          sleeper_faab: sleeperFaab
+        }).eq('id', existing.id);
+      } else if (user.user_id !== currentManager?.sleeper_user_id) {
+        // Insert new manager (no auth_id yet — they'll link when they sign in)
+        await sb.from('managers').insert({
+          sleeper_user_id: user.user_id,
+          display_name: displayName,
+          team_name: teamName,
+          faab_balance: sleeperFaab,
+          sleeper_faab: sleeperFaab,
+          is_commissioner: false
+        });
+      }
+      synced++;
+    }
+
+    // Recalculate all FAAB balances
+    await sb.rpc('recalc_all_faab');
+
+    await loadManagers();
+    msg.textContent = `Synced ${synced} members from Sleeper!`;
+    msg.className = 'commish-msg';
+    renderLeaderboard();
+  } catch (e) {
+    msg.textContent = 'Sync failed: ' + e.message;
+    msg.className = 'commish-msg error';
+  }
+}
+
+// ============================================
+// COMMISSIONER: Matchup Management
+// ============================================
+let commishWeek = 1;
+
+function changeCommishWeek(delta) {
+  commishWeek = Math.max(1, Math.min(18, commishWeek + delta));
+  document.getElementById('commish-week-label').textContent = 'WEEK ' + commishWeek;
+  renderCommishMatchups();
+}
+
+async function importWeekFromSleeper() {
+  const msg = document.getElementById('commish-matchup-cards');
+
+  try {
+    const sleeperMatchups = await fetchSleeperMatchups(commishWeek);
+    if (!sleeperMatchups || sleeperMatchups.length === 0) {
+      msg.innerHTML = '<div style="color:var(--accent-red);font-size:0.82rem;">No matchups found for Week ' + commishWeek + ' on Sleeper yet.</div>';
+      return;
+    }
+
+    // Group Sleeper matchups by matchup_id to pair opponents
+    const pairs = {};
+    const rosters = await fetchSleeperRosters();
+    const rosterToManager = {};
+    rosters.forEach(r => {
+      const mgr = allManagers.find(m => m.sleeper_user_id === r.owner_id);
+      if (mgr) rosterToManager[r.roster_id] = mgr.id;
+    });
+
+    sleeperMatchups.forEach(sm => {
+      if (!pairs[sm.matchup_id]) pairs[sm.matchup_id] = [];
+      pairs[sm.matchup_id].push(sm);
+    });
+
+    let imported = 0;
+    for (const [smId, pair] of Object.entries(pairs)) {
+      if (pair.length !== 2) continue;
+
+      const teamAManagerId = rosterToManager[pair[0].roster_id];
+      const teamBManagerId = rosterToManager[pair[1].roster_id];
+      if (!teamAManagerId || !teamBManagerId) continue;
+
+      // Check if matchup already exists
+      const { data: existing } = await sb.from('weekly_matchups')
+        .select('id')
+        .eq('week_number', commishWeek)
+        .eq('sleeper_matchup_id', parseInt(smId))
+        .maybeSingle();
+
+      const teamA = allManagers.find(m => m.id === teamAManagerId);
+      const teamB = allManagers.find(m => m.id === teamBManagerId);
+      const suggested = suggestMoneyline(teamA, teamB);
+
+      if (existing) {
+        // Update existing matchup
+        await sb.from('weekly_matchups').update({
+          team_a_id: teamAManagerId,
+          team_b_id: teamBManagerId,
+          team_a_line: suggested.teamALine,
+          team_b_line: suggested.teamBLine
+        }).eq('id', existing.id);
+      } else {
+        // Insert new matchup
+        await sb.from('weekly_matchups').insert({
+          week_number: commishWeek,
+          season: 2026,
+          sleeper_matchup_id: parseInt(smId),
+          team_a_id: teamAManagerId,
+          team_b_id: teamBManagerId,
+          team_a_line: suggested.teamALine,
+          team_b_line: suggested.teamBLine,
+          status: 'upcoming'
+        });
+      }
+      imported++;
+    }
+
+    await loadMatchups();
+    renderCommishMatchups();
+    renderMatchups();
+    document.getElementById('sync-msg').textContent = `Imported ${imported} matchups for Week ${commishWeek}!`;
+
+  } catch (e) {
+    msg.innerHTML = '<div style="color:var(--accent-red);font-size:0.82rem;">Import failed: ' + e.message + '</div>';
+  }
+}
+
+// ============================================
+// COMMISSIONER: Auto-Suggest Moneylines
+// ============================================
+function suggestMoneyline(teamA, teamB) {
+  // Power rating based on available data
+  // In preseason/early season with no data, use FAAB as a proxy
+  // As season progresses, use fpts and record
+  const powerA = calculatePower(teamA);
+  const powerB = calculatePower(teamB);
+  const diff = powerA - powerB;
+
+  // Convert power diff to American odds
+  // A diff of 0 = even game (-110/-110 with vig)
+  // Larger diffs = bigger favorites
+  if (Math.abs(diff) < 5) {
+    // Close to even — pick 'em
+    return { teamALine: -110, teamBLine: -110 };
+  }
+
+  const absDiff = Math.abs(diff);
+  // Scale: 5 diff ≈ -130, 15 diff ≈ -200, 30 diff ≈ -350
+  const favLine = -110 - Math.round(absDiff * 4);
+  const dogLine = Math.round(100 + absDiff * 3.5);
+
+  if (diff > 0) {
+    return { teamALine: Math.max(favLine, -500), teamBLine: Math.min(dogLine, 500) };
+  } else {
+    return { teamALine: Math.min(dogLine, 500), teamBLine: Math.max(favLine, -500) };
+  }
+}
+
+function calculatePower(manager) {
+  if (!manager) return 50;
+  // Use a combination of factors
+  let power = 50; // base
+
+  // Factor 1: FAAB balance (more FAAB = higher rated, proxy for success)
+  power += (manager.faab_balance - 1000) * 0.02;
+
+  // Factor 2: Betting record (winners trend up)
+  const mgBets = bets.filter(b => b.manager_id === manager.id);
+  const wins = mgBets.filter(b => b.result === 'won').length;
+  const losses = mgBets.filter(b => b.result === 'lost').length;
+  power += (wins - losses) * 2;
+
+  return power;
+}
+
+// ============================================
+// COMMISSIONER: Render Matchup Cards for Editing
+// ============================================
+function renderCommishMatchups() {
+  const container = document.getElementById('commish-matchup-cards');
+  const weekMatchups = matchups.filter(m => m.week_number === commishWeek);
+
+  if (weekMatchups.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-muted);font-size:0.82rem;font-style:italic;">No matchups for Week ' + commishWeek + '. Click "Import from Sleeper" to pull them in.</div>';
+    return;
+  }
+
+  container.innerHTML = weekMatchups.map(m => {
+    const teamA = getManager(m.team_a_id);
+    const teamB = getManager(m.team_b_id);
+    const suggested = suggestMoneyline(teamA, teamB);
+    return `
+      <div class="commish-matchup-card">
+        <div class="commish-status-row">
+          <select class="commish-status-select" id="status-${m.id}" onchange="updateMatchupStatus('${m.id}')">
+            <option value="upcoming" ${m.status === 'upcoming' ? 'selected' : ''}>Upcoming</option>
+            <option value="open" ${m.status === 'open' ? 'selected' : ''}>Open</option>
+            <option value="locked" ${m.status === 'locked' ? 'selected' : ''}>Locked</option>
+            <option value="resolved" ${m.status === 'resolved' ? 'selected' : ''}>Resolved</option>
+          </select>
+          <span style="font-size:0.65rem;color:var(--text-muted);">Matchup #${m.sleeper_matchup_id || '?'}</span>
+        </div>
+        <div class="commish-matchup-teams">
+          <span class="commish-team">${teamA.team_name}</span>
+          <span class="commish-vs">vs</span>
+          <span class="commish-team">${teamB.team_name}</span>
+        </div>
+        <div class="commish-line-row">
+          <span class="commish-line-label">${teamA.display_name}</span>
+          <input type="number" class="commish-line-input" id="lineA-${m.id}" value="${m.team_a_line || suggested.teamALine}" />
+          <span style="color:var(--text-muted);font-size:0.8rem;">|</span>
+          <input type="number" class="commish-line-input" id="lineB-${m.id}" value="${m.team_b_line || suggested.teamBLine}" />
+          <span class="commish-line-label">${teamB.display_name}</span>
+        </div>
+        <div class="commish-suggested">Suggested: ${formatOdds(suggested.teamALine)} / ${formatOdds(suggested.teamBLine)}</div>
+        <div class="commish-matchup-actions">
+          <button class="commish-btn" onclick="saveMatchupLines('${m.id}')" style="font-size:0.7rem;padding:5px 14px;">Save Lines</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function saveMatchupLines(matchupId) {
+  const lineA = parseInt(document.getElementById('lineA-' + matchupId).value);
+  const lineB = parseInt(document.getElementById('lineB-' + matchupId).value);
+
+  if (!lineA || !lineB) { alert('Enter valid lines for both teams'); return; }
+
+  const { error } = await sb.from('weekly_matchups').update({
+    team_a_line: lineA,
+    team_b_line: lineB
+  }).eq('id', matchupId);
+
+  if (error) { alert('Error: ' + error.message); return; }
+  await loadMatchups();
+  renderMatchups();
+  renderCommishMatchups();
+}
+
+async function updateMatchupStatus(matchupId) {
+  const status = document.getElementById('status-' + matchupId).value;
+  const { error } = await sb.from('weekly_matchups').update({ status }).eq('id', matchupId);
+  if (error) { alert('Error: ' + error.message); return; }
+  await loadMatchups();
+  renderMatchups();
+}
+
+async function publishAllLines() {
+  const weekMatchups = matchups.filter(m => m.week_number === commishWeek && m.status === 'upcoming');
+  if (weekMatchups.length === 0) { alert('No upcoming matchups to open for Week ' + commishWeek); return; }
+
+  for (const m of weekMatchups) {
+    // Save any edited lines first
+    const lineAEl = document.getElementById('lineA-' + m.id);
+    const lineBEl = document.getElementById('lineB-' + m.id);
+    const lineA = lineAEl ? parseInt(lineAEl.value) : m.team_a_line;
+    const lineB = lineBEl ? parseInt(lineBEl.value) : m.team_b_line;
+
+    await sb.from('weekly_matchups').update({
+      team_a_line: lineA,
+      team_b_line: lineB,
+      status: 'open',
+      betting_opens_at: new Date().toISOString(),
+      betting_closes_at: null // Commissioner can lock manually
+    }).eq('id', m.id);
+  }
+
+  await loadMatchups();
+  renderMatchups();
+  renderCommishMatchups();
+  alert('Betting is now OPEN for Week ' + commishWeek + '!');
+}
+
+// ============================================
+// COMMISSIONER: Auto-Settle from Sleeper
+// ============================================
+async function autoSettleFromSleeper() {
+  const msg = document.getElementById('settle-msg');
+  msg.textContent = 'Checking Sleeper scores...';
+
+  try {
+    const sleeperMatchups = await fetchSleeperMatchups(commishWeek);
+    const rosters = await fetchSleeperRosters();
+
+    const rosterToManager = {};
+    rosters.forEach(r => {
+      const mgr = allManagers.find(m => m.sleeper_user_id === r.owner_id);
+      if (mgr) rosterToManager[r.roster_id] = mgr.id;
+    });
+
+    // Group by matchup_id to get both sides
+    const pairs = {};
+    sleeperMatchups.forEach(sm => {
+      if (!pairs[sm.matchup_id]) pairs[sm.matchup_id] = [];
+      pairs[sm.matchup_id].push(sm);
+    });
+
+    let settled = 0;
+    for (const [smId, pair] of Object.entries(pairs)) {
+      if (pair.length !== 2) continue;
+
+      const scoreA = pair[0].points || 0;
+      const scoreB = pair[1].points || 0;
+      if (scoreA === 0 && scoreB === 0) continue; // No scores yet
+
+      const mgrAId = rosterToManager[pair[0].roster_id];
+      const mgrBId = rosterToManager[pair[1].roster_id];
+
+      // Find our matchup
+      const ourMatchup = matchups.find(m =>
+        m.week_number === commishWeek &&
+        m.sleeper_matchup_id === parseInt(smId) &&
+        (m.status === 'open' || m.status === 'locked')
+      );
+      if (!ourMatchup) continue;
+
+      const winnerId = scoreA > scoreB ? mgrAId : mgrBId;
+
+      const { error } = await sb.rpc('settle_matchup', {
+        p_matchup_id: ourMatchup.id,
+        p_winner_id: winnerId,
+        p_team_a_score: scoreA,
+        p_team_b_score: scoreB
+      });
+
+      if (!error) settled++;
+    }
+
+    await loadAll();
+    renderCommishMatchups();
+    msg.textContent = settled > 0 ? `Settled ${settled} matchup(s)!` : 'No matchups ready to settle (scores may not be final yet).';
+    msg.className = 'commish-msg';
+  } catch (e) {
+    msg.textContent = 'Settle failed: ' + e.message;
+    msg.className = 'commish-msg error';
+  }
 }
 
 // ============================================
@@ -676,7 +1236,21 @@ function updateBalance() {
     await loadManager();
     updateAuthUI(true);
   }
-  loadAll();
+
+  await loadAll();
+
+  // Commissioner panel logic
+  if (currentManager?.is_commissioner) {
+    document.getElementById('commish-panel').classList.add('visible');
+    renderCommishMatchups();
+  } else if (currentUser && allManagers.length === 0) {
+    // First user, no managers yet — show setup
+    document.getElementById('commish-panel').classList.add('visible');
+    document.getElementById('commish-setup').style.display = 'block';
+    document.getElementById('commish-body').classList.add('open');
+    document.getElementById('commish-toggle').textContent = 'COLLAPSE';
+    loadSleeperUsersForSetup();
+  }
 })();
 </script>
 
