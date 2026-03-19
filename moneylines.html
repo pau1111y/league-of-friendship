@@ -269,6 +269,16 @@
       </div>
       <button class="auth-btn secondary" id="auth-signout">Sign Out</button>
     </div>
+    <!-- CLAIM ACCOUNT (shown when logged in but no manager linked) -->
+    <div id="auth-claim" style="display:none; width:100%;">
+      <div style="margin-bottom:10px; color:var(--text-secondary); font-size:0.85rem;">Welcome! Select your Sleeper account to get started:</div>
+      <div class="auth-form">
+        <select class="auth-input" id="claim-select" style="min-width:240px;"><option value="">Loading...</option></select>
+        <button class="auth-btn" id="claim-btn">That's Me</button>
+        <button class="auth-btn secondary" id="auth-signout-claim">Sign Out</button>
+      </div>
+      <div class="auth-msg" id="claim-msg"></div>
+    </div>
   </div>
 
   <!-- BALANCE BAR (shown when logged in) -->
@@ -463,6 +473,32 @@ document.getElementById('auth-signout').addEventListener('click', async () => {
   window.location.reload();
 });
 
+document.getElementById('auth-signout-claim').addEventListener('click', async () => {
+  await sb.auth.signOut();
+  window.location.reload();
+});
+
+// Claim account: link auth user to existing Sleeper manager (via secure RPC)
+document.getElementById('claim-btn').addEventListener('click', async () => {
+  const select = document.getElementById('claim-select');
+  const msg = document.getElementById('claim-msg');
+  const managerId = select.value;
+  if (!managerId) { msg.textContent = 'Select your Sleeper account'; msg.className = 'auth-msg error'; return; }
+
+  const { error } = await sb.rpc('claim_manager', { p_manager_id: managerId });
+
+  if (error) {
+    msg.textContent = 'Error: ' + error.message;
+    msg.className = 'auth-msg error';
+  } else {
+    msg.textContent = 'Account linked!';
+    msg.className = 'auth-msg';
+    await loadManager();
+    await loadAll();
+    updateAuthUI(true);
+  }
+});
+
 sb.auth.onAuthStateChange(async (event, session) => {
   if (session?.user) {
     currentUser = session.user;
@@ -478,11 +514,15 @@ sb.auth.onAuthStateChange(async (event, session) => {
 });
 
 function updateAuthUI(loggedIn) {
-  document.getElementById('auth-logged-out').style.display = loggedIn ? 'none' : 'block';
-  document.getElementById('auth-logged-in').style.display = loggedIn ? 'flex' : 'none';
-  document.getElementById('balance-bar').style.display = loggedIn ? 'flex' : 'none';
+  const hasManager = loggedIn && currentManager;
+  const needsClaim = loggedIn && !currentManager;
 
-  if (loggedIn && currentManager) {
+  document.getElementById('auth-logged-out').style.display = loggedIn ? 'none' : 'block';
+  document.getElementById('auth-logged-in').style.display = hasManager ? 'flex' : 'none';
+  document.getElementById('auth-claim').style.display = needsClaim ? 'block' : 'none';
+  document.getElementById('balance-bar').style.display = hasManager ? 'flex' : 'none';
+
+  if (hasManager) {
     document.getElementById('user-display-name').textContent = currentManager.display_name;
     document.getElementById('user-team-name').textContent = currentManager.team_name;
     document.getElementById('bal-faab').textContent = '$' + currentManager.faab_balance.toLocaleString();
@@ -491,6 +531,18 @@ function updateAuthUI(loggedIn) {
     if (currentManager.is_commissioner) {
       document.getElementById('commish-panel').classList.add('visible');
       renderCommishMatchups();
+    }
+  }
+
+  // Populate claim dropdown with unclaimed managers
+  if (needsClaim) {
+    const select = document.getElementById('claim-select');
+    const unclaimed = allManagers.filter(m => !m.auth_id);
+    if (unclaimed.length > 0) {
+      select.innerHTML = '<option value="">— Select your Sleeper account —</option>' +
+        unclaimed.map(m => `<option value="${m.id}">${m.display_name}${m.team_name ? ' (' + m.team_name + ')' : ''}</option>`).join('');
+    } else {
+      select.innerHTML = '<option value="">No unclaimed accounts available</option>';
     }
   }
 
@@ -1254,12 +1306,17 @@ async function autoSettleFromSleeper() {
   if (session?.user) {
     currentUser = session.user;
     await loadManager();
+  }
+
+  // Load all data first so allManagers is populated for claim dropdown + commissioner check
+  await loadAll();
+
+  // Now update UI with full data available
+  if (currentUser) {
     updateAuthUI(true);
   }
 
-  await loadAll();
-
-  // Commissioner panel logic
+  // Commissioner panel logic (runs after allManagers is loaded)
   if (currentManager?.is_commissioner) {
     document.getElementById('commish-panel').classList.add('visible');
     renderCommishMatchups();
