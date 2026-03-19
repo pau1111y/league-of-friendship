@@ -56,12 +56,35 @@
 
   .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; position: relative; z-index: 1; }
 
-  .page-header { margin-bottom: 32px; }
+  .page-header { margin-bottom: 24px; }
   .page-header h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 2rem; font-weight: 900; margin-bottom: 8px; }
   .page-header .subtitle { color: var(--text-secondary); font-size: 0.95rem; }
-  .week-selector { display: inline-flex; gap: 8px; align-items: center; margin-left: 16px; vertical-align: middle; }
-  .week-selector select { background: var(--bg-accent); border: 1px solid var(--border-light); border-radius: 4px; padding: 6px 12px; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
-  .week-selector select:focus { outline: none; border-color: var(--accent-gold); }
+
+  /* AUTH */
+  .auth-bar { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px 24px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .auth-bar.logged-in { border-color: var(--accent-gold-dim); }
+  .auth-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .auth-input { background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: 4px; padding: 8px 14px; color: var(--text-primary); font-size: 0.85rem; min-width: 200px; }
+  .auth-input:focus { outline: none; border-color: var(--accent-gold); }
+  .auth-btn { background: var(--accent-gold); color: var(--bg-primary); border: none; border-radius: 4px; padding: 8px 20px; font-weight: 600; font-size: 0.8rem; cursor: pointer; letter-spacing: 0.5px; }
+  .auth-btn:hover { opacity: 0.9; }
+  .auth-btn.secondary { background: var(--bg-accent); color: var(--text-secondary); border: 1px solid var(--border-light); }
+  .auth-msg { font-size: 0.8rem; color: var(--accent-green); }
+  .auth-msg.error { color: var(--accent-red); }
+  .user-info-bar { display: flex; align-items: center; gap: 16px; }
+  .user-name-display { font-weight: 600; }
+  .user-team-display { font-size: 0.8rem; color: var(--text-muted); }
+
+  /* POLL TABS */
+  .poll-tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 2px solid var(--border); }
+  .poll-tab { padding: 12px 24px; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .poll-tab:hover { color: var(--text-secondary); }
+  .poll-tab.active { color: var(--accent-gold); border-bottom-color: var(--accent-gold); }
+  .poll-tab .tab-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; padding: 2px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+  .poll-tab .tab-badge.green { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+  .poll-tab .tab-badge.purple { background: rgba(99, 102, 241, 0.15); color: var(--accent-portal-glow); }
+  .poll-tab .tab-badge.gold { background: rgba(201, 168, 76, 0.15); color: var(--accent-gold); }
+  .poll-tab .tab-badge.orange { background: rgba(245, 158, 11, 0.15); color: var(--accent-orange); }
 
   /* RANKINGS GRID */
   .rankings-layout { display: grid; grid-template-columns: 1fr 380px; gap: 32px; }
@@ -93,6 +116,39 @@
 
   .rank-blurb { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; font-style: italic; border-left: 2px solid var(--accent-gold-dim); padding-left: 12px; margin-top: 4px; }
 
+  /* MANAGERS POLL - VOTE UI */
+  .vote-panel { background: var(--bg-card); border: 1px solid var(--accent-gold-dim); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+  .vote-panel h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 4px; }
+  .vote-panel .vote-subtitle { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 16px; }
+  .vote-list { list-style: none; }
+  .vote-item { background: var(--bg-accent); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 16px; margin-bottom: 6px; display: flex; align-items: center; gap: 12px; cursor: grab; transition: all 0.15s; user-select: none; }
+  .vote-item:active { cursor: grabbing; }
+  .vote-item:hover { border-color: var(--accent-gold-dim); }
+  .vote-item.dragging { opacity: 0.5; border-color: var(--accent-gold); }
+  .vote-item.drag-over { border-top: 2px solid var(--accent-gold); }
+  .vote-rank { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent-gold-dim); width: 24px; text-align: center; flex-shrink: 0; }
+  .vote-team { font-weight: 600; font-size: 0.85rem; flex: 1; }
+  .vote-mgr { font-size: 0.7rem; color: var(--text-muted); }
+  .vote-grip { color: var(--text-muted); font-size: 0.9rem; flex-shrink: 0; }
+  .vote-arrows { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+  .vote-arrow { background: none; border: 1px solid var(--border-light); border-radius: 3px; color: var(--text-muted); font-size: 0.65rem; padding: 2px 6px; cursor: pointer; transition: all 0.15s; line-height: 1; }
+  .vote-arrow:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+  .vote-submit-row { display: flex; gap: 12px; align-items: center; margin-top: 16px; }
+  .vote-submit-btn { background: linear-gradient(135deg, var(--accent-gold), #b8943f); color: var(--bg-primary); border: none; border-radius: 4px; padding: 10px 24px; font-weight: 700; font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
+  .vote-submit-btn:hover { opacity: 0.9; }
+  .vote-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .vote-msg { font-size: 0.78rem; }
+
+  /* MANAGERS POLL RESULTS */
+  .poll-result-entry { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; display: grid; grid-template-columns: 64px 1fr; overflow: hidden; }
+  .poll-result-entry.top-3 { border-color: var(--accent-gold-dim); }
+  .poll-avg { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--accent-portal-glow); }
+  .poll-voters { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
+  .poll-voter-dots { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+  .poll-voter-dot { font-size: 0.6rem; background: var(--bg-accent); border: 1px solid var(--border-light); border-radius: 3px; padding: 1px 6px; color: var(--text-muted); }
+  .poll-voter-dot.high { color: var(--accent-green); border-color: rgba(34,197,94,0.3); }
+  .poll-voter-dot.low { color: var(--accent-red); border-color: rgba(239,68,68,0.3); }
+
   /* SIDEBAR */
   .sidebar { display: flex; flex-direction: column; gap: 24px; }
 
@@ -111,8 +167,17 @@
   .top-perf-label { color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
   .top-perf-value { font-family: 'JetBrains Mono', monospace; color: var(--accent-gold); font-size: 0.82rem; }
 
+  /* VOTERS LIST */
+  .voters-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .voters-card h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 0.95rem; font-weight: 700; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .voter-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 20px; border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+  .voter-row:last-child { border-bottom: none; }
+  .voter-status { font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; }
+  .voter-status.voted { color: var(--accent-green); }
+  .voter-status.pending { color: var(--text-muted); }
+
   /* COMMISH RANKINGS EDITOR */
-  .commish-panel { background: var(--bg-card); border: 2px solid var(--accent-portal); border-radius: 8px; padding: 24px; margin-bottom: 32px; display: none; }
+  .commish-panel { background: var(--bg-card); border: 2px solid var(--accent-portal); border-radius: 8px; padding: 24px; margin-bottom: 24px; display: none; }
   .commish-panel.visible { display: block; }
   .commish-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; cursor: pointer; }
   .commish-panel-header h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; font-weight: 700; color: var(--accent-portal-glow); }
@@ -143,6 +208,8 @@
     .rank-stats { gap: 12px; }
     .rank-editor-row { grid-template-columns: 40px 1fr; }
     .rank-editor-row textarea { grid-column: 1 / -1; }
+    .poll-tabs { overflow-x: auto; }
+    .poll-tab { white-space: nowrap; padding: 10px 16px; font-size: 0.7rem; }
   }
 </style>
 </head>
@@ -175,24 +242,49 @@
 
 <div class="container">
   <div class="page-header">
-    <h1>Power Rankings
-      <span class="week-selector">
-        <select id="rankings-week-select" onchange="changeRankingsWeek()">
-          <option value="latest">Latest</option>
-        </select>
-      </span>
-    </h1>
-    <div class="subtitle">The Commissioner's poll meets the algorithm. Not everyone agrees, and that's the point.</div>
+    <h1>Power Rankings</h1>
+    <div class="subtitle">Three polls. Three truths. The managers vote. The algorithm calculates. The standings don't lie. Who's right?</div>
+  </div>
+
+  <!-- AUTH BAR -->
+  <div class="auth-bar" id="auth-bar">
+    <div id="auth-logged-out">
+      <div class="auth-form">
+        <input type="email" class="auth-input" id="auth-email" placeholder="Email">
+        <input type="password" class="auth-input" id="auth-password" placeholder="Password" style="min-width:140px;">
+        <button class="auth-btn" id="auth-signin">Sign In</button>
+        <button class="auth-btn secondary" id="auth-signup">Sign Up</button>
+      </div>
+      <div class="auth-msg" id="auth-msg"></div>
+    </div>
+    <div id="auth-logged-in" style="display:none; width:100%; justify-content:space-between; align-items:center;">
+      <div class="user-info-bar">
+        <div>
+          <div class="user-name-display" id="user-display-name"></div>
+          <div class="user-team-display" id="user-team-name"></div>
+        </div>
+      </div>
+      <button class="auth-btn secondary" id="auth-signout">Sign Out</button>
+    </div>
+    <div id="auth-claim" style="display:none; width:100%;">
+      <div style="margin-bottom:10px; color:var(--text-secondary); font-size:0.85rem;">Welcome! Select your Sleeper account to get started:</div>
+      <div class="auth-form">
+        <select class="auth-input" id="claim-select" style="min-width:240px;"><option value="">Loading...</option></select>
+        <button class="auth-btn" id="claim-btn">That's Me</button>
+        <button class="auth-btn secondary" id="auth-signout-claim">Sign Out</button>
+      </div>
+      <div class="auth-msg" id="claim-msg"></div>
+    </div>
   </div>
 
   <!-- COMMISSIONER: Rankings Editor -->
   <div class="commish-panel" id="commish-panel">
     <div class="commish-panel-header" onclick="toggleCommishPanel()">
-      <h2>Publish Rankings</h2>
+      <h2>Commissioner Controls — Publish Rankings</h2>
       <span class="commish-badge" id="commish-toggle">EXPAND</span>
     </div>
     <div class="commish-body" id="commish-body">
-      <p style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:12px;">Drag the algorithm's suggestion below, adjust ranks, add your blurbs, and publish. The algorithm generates a starting order — you override it with the eye test.</p>
+      <p style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:12px;">Generate from the algorithm, adjust ranks, add your blurbs, and publish your Commissioner's Poll. The Managers' Poll runs separately from their votes.</p>
       <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
         <input type="text" id="rankings-label-input" placeholder='Label (e.g. "Post-Auction", "Week 3")' style="background:var(--bg-primary);border:1px solid var(--border-light);border-radius:4px;padding:8px 14px;color:var(--text-primary);font-size:0.85rem;min-width:240px;">
         <button class="commish-btn" onclick="generateAlgoRankings()">Generate from Algorithm</button>
@@ -205,17 +297,43 @@
     </div>
   </div>
 
+  <!-- POLL TABS -->
+  <div class="poll-tabs">
+    <div class="poll-tab active" onclick="switchTab('managers')" id="tab-managers">Managers' Poll <span class="tab-badge green" id="vote-count-badge">0/0</span></div>
+    <div class="poll-tab" onclick="switchTab('algorithm')" id="tab-algorithm">Algorithm <span class="tab-badge purple">AUTO</span></div>
+    <div class="poll-tab" onclick="switchTab('commish')" id="tab-commish">Commissioner's Poll <span class="tab-badge gold">OFFICIAL</span></div>
+    <div class="poll-tab" onclick="switchTab('standings')" id="tab-standings">Standings <span class="tab-badge orange">RECORD</span></div>
+  </div>
+
+  <!-- VOTE PANEL (logged-in managers only) -->
+  <div class="vote-panel" id="vote-panel" style="display:none;">
+    <h3>Submit Your Rankings</h3>
+    <div class="vote-subtitle" id="vote-subtitle">Drag teams into your order, or use the arrows. Your vote counts toward the Managers' Poll.</div>
+    <div class="vote-list" id="vote-list"></div>
+    <div class="vote-submit-row">
+      <button class="vote-submit-btn" onclick="submitVote()" id="vote-submit-btn">Submit My Rankings</button>
+      <span class="vote-msg" id="vote-msg"></span>
+    </div>
+  </div>
+
   <div class="rankings-layout">
-    <!-- LEFT: Rankings -->
+    <!-- LEFT: Rankings (switched by tab) -->
     <div id="rankings-container">
       <div style="text-align:center; padding:40px; color:var(--text-muted); font-style:italic;">Loading power rankings...</div>
     </div>
 
     <!-- RIGHT: Sidebar -->
     <aside class="sidebar">
+      <div class="voters-card" id="voters-card">
+        <h3>Managers' Ballot Box</h3>
+        <div id="voters-container">
+          <div class="voter-row"><span style="color:var(--text-muted);font-style:italic;font-size:0.82rem;">Loading...</span></div>
+        </div>
+      </div>
+
       <div class="methodology-card">
         <h3>The Algorithm</h3>
-        <p>The power score blends Sleeper data with the Commissioner's eye test. The algorithm suggests — the Commissioner decides.</p>
+        <p>The power score blends Sleeper data. No bias, no feelings, just math.</p>
         <div class="factor">
           <span class="factor-name">FAAB Remaining</span>
           <span class="factor-weight">25%</span>
@@ -241,19 +359,13 @@
       <div class="top-performers">
         <h3>League Superlatives</h3>
         <div id="superlatives-container">
-          <div class="top-perf-row">
-            <div>
-              <div class="top-perf-label">Highest Scorer</div>
-              <div>—</div>
-            </div>
-            <div class="top-perf-value">—</div>
-          </div>
+          <div class="top-perf-row"><div><div class="top-perf-label">Loading...</div><div>—</div></div><div class="top-perf-value">—</div></div>
         </div>
       </div>
 
       <div class="methodology-card">
         <h3>Commissioner's Note</h3>
-        <p id="commish-note" style="font-style:italic;">"Rankings are opinions, not facts. That's what makes them fun. Argue with me in the group chat."</p>
+        <p style="font-style:italic;">"Rankings are opinions, not facts. That's what makes them fun. Argue with me in the group chat."</p>
       </div>
     </aside>
   </div>
@@ -283,15 +395,132 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 let currentManager = null;
 let allManagers = [];
-let rankings = [];
+let rankings = [];    // Commissioner's published rankings
+let managerVotes = []; // All manager_ranking_votes
 let bets = [];
 let sleeperRosters = [];
 let sleeperUsers = [];
 let sleeperMatchupsCache = {};
+let algoScoresCache = null;
+let activeTab = 'managers';
+
+// Vote ordering state
+let voteOrder = []; // array of manager IDs in the user's chosen order
+
+// ============================================
+// AUTH
+// ============================================
+document.getElementById('auth-signin').addEventListener('click', async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const msg = document.getElementById('auth-msg');
+  if (!email || !password) { msg.textContent = 'Enter email and password'; msg.className = 'auth-msg error'; return; }
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { msg.textContent = error.message; msg.className = 'auth-msg error'; }
+});
+
+document.getElementById('auth-signup').addEventListener('click', async () => {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const msg = document.getElementById('auth-msg');
+  if (!email || !password) { msg.textContent = 'Enter email and password'; msg.className = 'auth-msg error'; return; }
+  if (password.length < 6) { msg.textContent = 'Password must be at least 6 characters'; msg.className = 'auth-msg error'; return; }
+  const { error } = await sb.auth.signUp({ email, password });
+  if (error) { msg.textContent = error.message; msg.className = 'auth-msg error'; }
+  else { msg.textContent = 'Account created! You are now signed in.'; msg.className = 'auth-msg'; }
+});
+
+document.getElementById('auth-password').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('auth-signin').click();
+});
+
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (session?.user) {
+    currentUser = session.user;
+    await loadManager();
+    await loadAll();
+    updateAuthUI(true);
+  } else {
+    currentUser = null;
+    currentManager = null;
+    updateAuthUI(false);
+  }
+});
+
+function updateAuthUI(loggedIn) {
+  const bar = document.getElementById('auth-bar');
+  const loggedOutDiv = document.getElementById('auth-logged-out');
+  const loggedInDiv = document.getElementById('auth-logged-in');
+  const claimDiv = document.getElementById('auth-claim');
+
+  if (!loggedIn) {
+    bar.classList.remove('logged-in');
+    loggedOutDiv.style.display = '';
+    loggedInDiv.style.display = 'none';
+    claimDiv.style.display = 'none';
+    document.getElementById('vote-panel').style.display = 'none';
+    return;
+  }
+
+  loggedOutDiv.style.display = 'none';
+
+  if (currentManager) {
+    // Fully linked
+    bar.classList.add('logged-in');
+    loggedInDiv.style.display = 'flex';
+    claimDiv.style.display = 'none';
+    document.getElementById('user-display-name').textContent = currentManager.display_name;
+    document.getElementById('user-team-name').textContent = currentManager.team_name;
+    // Show vote panel
+    document.getElementById('vote-panel').style.display = '';
+    initVoteUI();
+  } else {
+    // Needs to claim an account
+    bar.classList.remove('logged-in');
+    loggedInDiv.style.display = 'none';
+    claimDiv.style.display = '';
+    document.getElementById('vote-panel').style.display = 'none';
+    // Populate claim dropdown
+    const select = document.getElementById('claim-select');
+    const unclaimed = allManagers.filter(m => !m.auth_id);
+    select.innerHTML = '<option value="">— Select your account —</option>' +
+      unclaimed.map(m => `<option value="${m.id}">${m.display_name} (${m.team_name})</option>`).join('');
+  }
+
+  // Commissioner panel
+  if (currentManager?.is_commissioner) {
+    document.getElementById('commish-panel').classList.add('visible');
+  }
+
+  renderActiveTab();
+  renderVotersSidebar();
+}
+
+// Sign out handlers
+document.getElementById('auth-signout').addEventListener('click', () => sb.auth.signOut());
+document.getElementById('auth-signout-claim')?.addEventListener('click', () => sb.auth.signOut());
+
+// Claim handler
+document.getElementById('claim-btn').addEventListener('click', async () => {
+  const managerId = document.getElementById('claim-select').value;
+  const msg = document.getElementById('claim-msg');
+  if (!managerId) { msg.textContent = 'Select your account'; msg.className = 'auth-msg error'; return; }
+  const { error } = await sb.rpc('claim_manager', { p_manager_id: managerId });
+  if (error) { msg.textContent = error.message; msg.className = 'auth-msg error'; return; }
+  msg.textContent = 'Account claimed!';
+  msg.className = 'auth-msg';
+  await loadManager();
+  await loadAll();
+  updateAuthUI(true);
+});
 
 // ============================================
 // DATA LOADING
 // ============================================
+async function loadAll() {
+  await Promise.all([loadManagers(), loadRankings(), loadBets(), loadManagerVotes()]);
+}
+
 async function loadManagers() {
   const { data } = await sb.from('managers').select('*').order('faab_balance', { ascending: false });
   allManagers = data || [];
@@ -313,6 +542,11 @@ async function loadBets() {
   bets = data || [];
 }
 
+async function loadManagerVotes() {
+  const { data } = await sb.from('manager_ranking_votes').select('*').order('created_at', { ascending: false });
+  managerVotes = data || [];
+}
+
 function getManager(id) {
   return allManagers.find(m => m.id === id) || { display_name: 'Unknown', team_name: 'Unknown', faab_balance: 0 };
 }
@@ -324,12 +558,10 @@ async function fetchSleeperRosters() {
   const res = await fetch(`${SLEEPER_API}/league/${SLEEPER_LEAGUE_ID}/rosters`);
   return res.json();
 }
-
 async function fetchSleeperUsers() {
   const res = await fetch(`${SLEEPER_API}/league/${SLEEPER_LEAGUE_ID}/users`);
   return res.json();
 }
-
 async function fetchSleeperMatchups(week) {
   if (sleeperMatchupsCache[week]) return sleeperMatchupsCache[week];
   const res = await fetch(`${SLEEPER_API}/league/${SLEEPER_LEAGUE_ID}/matchups/${week}`);
@@ -337,12 +569,10 @@ async function fetchSleeperMatchups(week) {
   sleeperMatchupsCache[week] = data;
   return data;
 }
-
 async function fetchNFLState() {
   const res = await fetch(`${SLEEPER_API}/state/nfl`);
   return res.json();
 }
-
 async function fetchSleeperLeague() {
   const res = await fetch(`${SLEEPER_API}/league/${SLEEPER_LEAGUE_ID}`);
   return res.json();
@@ -352,28 +582,17 @@ async function fetchSleeperLeague() {
 // ALGORITHM: Power Score Calculation
 // ============================================
 async function calculatePowerScores() {
-  // Fetch Sleeper data
-  const [rosters, users, league, nflState] = await Promise.all([
-    fetchSleeperRosters(),
-    fetchSleeperUsers(),
-    fetchSleeperLeague(),
-    fetchNFLState()
-  ]);
+  if (algoScoresCache) return algoScoresCache;
 
+  const [rosters, users, league, nflState] = await Promise.all([
+    fetchSleeperRosters(), fetchSleeperUsers(), fetchSleeperLeague(), fetchNFLState()
+  ]);
   sleeperRosters = rosters;
   sleeperUsers = users;
 
   const currentWeek = nflState.week || 0;
   const waiverBudget = league.settings?.waiver_budget || 1000;
 
-  // Build roster → manager map
-  const rosterToManager = {};
-  rosters.forEach(r => {
-    const mgr = allManagers.find(m => m.sleeper_user_id === r.owner_id);
-    if (mgr) rosterToManager[r.roster_id] = mgr;
-  });
-
-  // Calculate total points scored across all weeks
   let totalPointsByRoster = {};
   for (let w = 1; w <= Math.max(currentWeek, 1); w++) {
     try {
@@ -382,176 +601,173 @@ async function calculatePowerScores() {
         if (!totalPointsByRoster[m.roster_id]) totalPointsByRoster[m.roster_id] = 0;
         totalPointsByRoster[m.roster_id] += (m.points || 0);
       });
-    } catch (e) { /* week not available */ }
+    } catch (e) {}
   }
 
-  // Build scores per manager
   const scores = allManagers.map(mgr => {
     const roster = rosters.find(r => r.owner_id === mgr.sleeper_user_id);
-    if (!roster) return { manager: mgr, powerScore: 0, stats: {} };
+    if (!roster) return { manager: mgr, powerScore: 0, rawPoints: 0, stats: { wins: 0, losses: 0, winPct: 50, totalPoints: 0, faabRemaining: waiverBudget, faabPct: 100, rosterSize: 0, betRecord: '0-0', bettingPL: 0, faabScore: 100, winScore: 50, rosterScore: 0 } };
 
     const wins = roster.settings?.wins || 0;
     const losses = roster.settings?.losses || 0;
     const totalGames = wins + losses;
     const winPct = totalGames > 0 ? wins / totalGames : 0.5;
-
     const faabRemaining = waiverBudget - (roster.settings?.waiver_budget_used || 0);
     const faabPct = faabRemaining / waiverBudget;
-
     const totalPoints = totalPointsByRoster[roster.roster_id] || 0;
     const rosterSize = (roster.players || []).length;
-
-    // Betting P/L
     const mgrBets = bets.filter(b => b.manager_id === mgr.id);
     const betWins = mgrBets.filter(b => b.result === 'won').length;
     const betLosses = mgrBets.filter(b => b.result === 'lost').length;
     const bettingPL = mgr.faab_balance - (mgr.sleeper_faab || waiverBudget);
 
-    // Normalize factors (0-100 scale)
-    const faabScore = faabPct * 100;
-    const winScore = winPct * 100;
-    // Points: normalize against max in league
-    const rosterScore = Math.min(rosterSize / 20 * 100, 100); // 20 players = 100
-
-    // Weighted composite (points will be normalized after we have all scores)
     return {
-      manager: mgr,
-      roster,
-      powerScore: 0, // calculated after normalization
-      rawPoints: totalPoints,
-      stats: {
-        wins,
-        losses,
-        winPct: Math.round(winPct * 1000) / 10,
-        totalPoints: Math.round(totalPoints * 10) / 10,
-        faabRemaining,
-        faabPct: Math.round(faabPct * 100),
-        rosterSize,
-        betRecord: `${betWins}-${betLosses}`,
-        bettingPL,
-        faabScore,
-        winScore,
-        rosterScore
-      }
+      manager: mgr, roster, powerScore: 0, rawPoints: totalPoints,
+      stats: { wins, losses, winPct: Math.round(winPct * 1000) / 10, totalPoints: Math.round(totalPoints * 10) / 10, faabRemaining, faabPct: Math.round(faabPct * 100), rosterSize, betRecord: `${betWins}-${betLosses}`, bettingPL, faabScore: faabPct * 100, winScore: winPct * 100, rosterScore: Math.min(rosterSize / 20 * 100, 100) }
     };
   });
 
-  // Normalize points across the league
   const maxPoints = Math.max(...scores.map(s => s.rawPoints), 1);
-
   scores.forEach(s => {
     const pointsScore = (s.rawPoints / maxPoints) * 100;
-
-    // Betting P/L normalize (-100 to +100 range)
     const bettingScore = Math.max(Math.min(s.stats.bettingPL * 0.05 + 50, 100), 0);
-
-    // Weighted composite
-    s.powerScore = Math.round(
-      s.stats.faabScore * 0.25 +
-      pointsScore * 0.25 +
-      s.stats.winScore * 0.20 +
-      bettingScore * 0.15 +
-      s.stats.rosterScore * 0.15
-    );
-    s.stats.pointsScore = Math.round(pointsScore);
-    s.stats.bettingScore = Math.round(bettingScore);
+    s.powerScore = Math.round(s.stats.faabScore * 0.25 + pointsScore * 0.25 + s.stats.winScore * 0.20 + bettingScore * 0.15 + s.stats.rosterScore * 0.15);
   });
 
-  // Sort by power score descending
   scores.sort((a, b) => b.powerScore - a.powerScore);
-
+  algoScoresCache = scores;
   return scores;
 }
 
 // ============================================
-// RENDER: Rankings
+// TAB SWITCHING
 // ============================================
-function renderRankings() {
-  const container = document.getElementById('rankings-container');
-  const selector = document.getElementById('rankings-week-select');
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.poll-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  renderActiveTab();
+}
 
-  // Get unique week labels
-  const weekLabels = [...new Set(rankings.map(r => r.week_label))];
-
-  // Populate week selector
-  selector.innerHTML = '<option value="latest">Latest</option>' +
-    weekLabels.map(w => `<option value="${w}">${w}</option>`).join('');
-
-  const selectedWeek = selector.value;
-  let displayRankings;
-
-  if (selectedWeek === 'latest' && weekLabels.length > 0) {
-    displayRankings = rankings.filter(r => r.week_label === weekLabels[0]);
-  } else if (selectedWeek !== 'latest') {
-    displayRankings = rankings.filter(r => r.week_label === selectedWeek);
-  } else {
-    displayRankings = [];
+function renderActiveTab() {
+  switch (activeTab) {
+    case 'managers': renderManagersPoll(); break;
+    case 'algorithm': renderAlgorithmRankings(); break;
+    case 'commish': renderCommishPoll(); break;
+    case 'standings': renderStandings(); break;
   }
+}
 
-  if (displayRankings.length === 0) {
-    // No published rankings — show algorithm-only view
+// ============================================
+// MANAGERS' POLL (aggregated votes)
+// ============================================
+function renderManagersPoll() {
+  const container = document.getElementById('rankings-container');
+  const latestVotes = getLatestVotesPerManager();
+  const voterCount = latestVotes.length;
+
+  document.getElementById('vote-count-badge').textContent = `${voterCount}/${allManagers.filter(m=>m.auth_id).length}`;
+
+  if (voterCount === 0) {
     container.innerHTML = `
       <div style="text-align:center; padding:40px; color:var(--text-muted);">
-        <div style="font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; margin-bottom:8px; color:var(--text-secondary);">No Rankings Published Yet</div>
-        <div style="font-size:0.9rem;">The Commissioner hasn't dropped the first poll.${currentManager?.is_commissioner ? ' Use the panel above to publish.' : ' Check back soon.'}</div>
+        <div style="font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; margin-bottom:8px; color:var(--text-secondary);">No Votes Yet</div>
+        <div style="font-size:0.9rem;">${currentManager ? 'Be the first to submit your rankings above.' : 'Sign in to cast your vote.'}</div>
       </div>`;
-    // Still try to show algo rankings
-    showAlgorithmRankings();
     return;
   }
 
-  // Sort by rank
-  displayRankings.sort((a, b) => a.rank - b.rank);
+  // Compute average rank per manager
+  const rankSums = {};
+  const rankCounts = {};
+  const individualRanks = {}; // managerId -> [{voterName, rank}]
 
-  const weekLabel = displayRankings[0]?.week_label || '';
+  allManagers.forEach(m => { rankSums[m.id] = 0; rankCounts[m.id] = 0; individualRanks[m.id] = []; });
+
+  latestVotes.forEach(vote => {
+    const voterMgr = getManager(vote.manager_id);
+    const orderedIds = vote.rankings; // array of manager IDs
+    orderedIds.forEach((mgrId, idx) => {
+      const rank = idx + 1;
+      rankSums[mgrId] = (rankSums[mgrId] || 0) + rank;
+      rankCounts[mgrId] = (rankCounts[mgrId] || 0) + 1;
+      if (!individualRanks[mgrId]) individualRanks[mgrId] = [];
+      individualRanks[mgrId].push({ voterName: voterMgr.display_name, rank });
+    });
+  });
+
+  // Build sorted array by average rank
+  const pollResults = allManagers
+    .filter(m => rankCounts[m.id] > 0)
+    .map(m => ({
+      manager: m,
+      avgRank: rankSums[m.id] / rankCounts[m.id],
+      votes: individualRanks[m.id] || [],
+      highRank: Math.min(...(individualRanks[m.id] || []).map(v => v.rank)),
+      lowRank: Math.max(...(individualRanks[m.id] || []).map(v => v.rank))
+    }))
+    .sort((a, b) => a.avgRank - b.avgRank);
 
   container.innerHTML = `
     <div style="margin-bottom:20px;">
-      <div style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:4px;">Commissioner's Poll — ${weekLabel}</div>
-      <div style="font-size:0.75rem; color:var(--text-muted);">Published ${new Date(displayRankings[0].created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+      <div style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:4px;">Managers' Poll</div>
+      <div style="font-size:0.75rem; color:var(--text-muted);">${voterCount} ballot(s) submitted — average ranking determines order</div>
     </div>
-  ` + displayRankings.map((r, i) => {
-    const mgr = getManager(r.manager_id);
-    const movement = r.prev_rank ? r.prev_rank - r.rank : 0;
-    let movementHtml = '<span class="rank-movement same">—</span>';
-    if (movement > 0) movementHtml = `<span class="rank-movement up">▲${movement}</span>`;
-    else if (movement < 0) movementHtml = `<span class="rank-movement down">▼${Math.abs(movement)}</span>`;
+  ` + pollResults.map((r, i) => {
+    const rank = i + 1;
+    const highVoter = r.votes.find(v => v.rank === r.highRank);
+    const lowVoter = r.votes.find(v => v.rank === r.lowRank);
 
     return `
-      <div class="ranking-entry ${r.rank <= 3 ? 'top-3' : ''}">
+      <div class="poll-result-entry ${rank <= 3 ? 'top-3' : ''}">
         <div class="rank-badge">
-          <div class="rank-number">${r.rank}</div>
-          ${movementHtml}
+          <div class="rank-number">${rank}</div>
+          <span class="rank-movement same" style="font-size:0.55rem;">avg ${r.avgRank.toFixed(1)}</span>
         </div>
         <div class="rank-details">
           <div class="rank-top-row">
             <div>
-              <div class="rank-team-name">${mgr.team_name}</div>
-              <div class="rank-manager">${mgr.display_name}</div>
+              <div class="rank-team-name">${r.manager.team_name}</div>
+              <div class="rank-manager">${r.manager.display_name}</div>
             </div>
-            <div class="rank-score">$${mgr.faab_balance?.toLocaleString() || '—'}</div>
+            <div class="rank-score">$${r.manager.faab_balance?.toLocaleString() || '—'}</div>
           </div>
-          <div class="rank-stats">
-            <div class="rank-stat"><span class="rank-stat-label">FAAB</span> <span class="rank-stat-value">$${mgr.faab_balance?.toLocaleString() || '—'}</span></div>
-          </div>
-          ${r.blurb ? `<div class="rank-blurb">${r.blurb}</div>` : ''}
+          ${r.votes.length > 1 ? `
+          <div class="poll-voter-dots">
+            ${r.votes.sort((a,b) => a.rank - b.rank).map(v => `<span class="poll-voter-dot ${v.rank <= 3 ? 'high' : v.rank >= allManagers.length - 2 ? 'low' : ''}">${v.voterName}: #${v.rank}</span>`).join('')}
+          </div>` : ''}
+          ${r.votes.length > 1 ? `<div style="font-size:0.65rem;color:var(--text-muted);margin-top:2px;">High: #${r.highRank} (${highVoter?.voterName}) &middot; Low: #${r.lowRank} (${lowVoter?.voterName})</div>` : ''}
         </div>
       </div>`;
   }).join('');
 }
 
-async function showAlgorithmRankings() {
+function getLatestVotesPerManager() {
+  // Get the most recent vote per manager
+  const latest = {};
+  managerVotes.forEach(v => {
+    if (!latest[v.manager_id] || new Date(v.created_at) > new Date(latest[v.manager_id].created_at)) {
+      latest[v.manager_id] = v;
+    }
+  });
+  return Object.values(latest);
+}
+
+// ============================================
+// ALGORITHM RANKINGS
+// ============================================
+async function renderAlgorithmRankings() {
   const container = document.getElementById('rankings-container');
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">Calculating algorithm rankings from Sleeper data...</div>';
 
   try {
     const scores = await calculatePowerScores();
-
-    if (scores.length === 0) return;
+    if (scores.length === 0) { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">No data available.</div>'; return; }
 
     container.innerHTML = `
       <div style="margin-bottom:20px;">
         <div style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:4px;">Algorithm Rankings <span style="font-size:0.7rem;color:var(--accent-portal-glow);background:rgba(99,102,241,0.15);padding:2px 8px;border-radius:3px;margin-left:8px;">AUTO-GENERATED</span></div>
-        <div style="font-size:0.75rem; color:var(--text-muted);">These are computed from Sleeper data. The Commissioner's published poll may differ.</div>
+        <div style="font-size:0.75rem; color:var(--text-muted);">Computed from Sleeper data. No feelings, no bias, just math.</div>
       </div>
     ` + scores.map((s, i) => `
       <div class="ranking-entry ${i < 3 ? 'top-3' : ''}">
@@ -575,16 +791,124 @@ async function showAlgorithmRankings() {
             <div class="rank-stat"><span class="rank-stat-label">Roster</span> <span class="rank-stat-value">${s.stats.rosterSize}</span></div>
           </div>
         </div>
-      </div>
-    `).join('');
+      </div>`).join('');
 
-    // Update superlatives
     renderSuperlatives(scores);
   } catch (e) {
-    console.error('Algorithm rankings failed:', e);
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--accent-red);">Algorithm error: ' + e.message + '</div>';
   }
 }
 
+// ============================================
+// COMMISSIONER'S POLL
+// ============================================
+function renderCommishPoll() {
+  const container = document.getElementById('rankings-container');
+  const weekLabels = [...new Set(rankings.map(r => r.week_label))];
+
+  if (weekLabels.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:40px; color:var(--text-muted);">
+        <div style="font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; margin-bottom:8px; color:var(--text-secondary);">No Commissioner's Poll Yet</div>
+        <div style="font-size:0.9rem;">${currentManager?.is_commissioner ? 'Use the panel above to publish your first poll.' : 'The Commissioner hasn\'t dropped the first poll. Check back soon.'}</div>
+      </div>`;
+    return;
+  }
+
+  const latestLabel = weekLabels[0];
+  const displayRankings = rankings.filter(r => r.week_label === latestLabel).sort((a, b) => a.rank - b.rank);
+
+  container.innerHTML = `
+    <div style="margin-bottom:20px;">
+      <div style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:4px;">Commissioner's Poll — ${latestLabel}</div>
+      <div style="font-size:0.75rem; color:var(--text-muted);">Published ${new Date(displayRankings[0].created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+    </div>
+  ` + displayRankings.map((r, i) => {
+    const mgr = getManager(r.manager_id);
+    const movement = r.prev_rank ? r.prev_rank - r.rank : 0;
+    let movementHtml = '<span class="rank-movement same">—</span>';
+    if (movement > 0) movementHtml = `<span class="rank-movement up">&#9650;${movement}</span>`;
+    else if (movement < 0) movementHtml = `<span class="rank-movement down">&#9660;${Math.abs(movement)}</span>`;
+
+    return `
+      <div class="ranking-entry ${r.rank <= 3 ? 'top-3' : ''}">
+        <div class="rank-badge">
+          <div class="rank-number">${r.rank}</div>
+          ${movementHtml}
+        </div>
+        <div class="rank-details">
+          <div class="rank-top-row">
+            <div>
+              <div class="rank-team-name">${mgr.team_name}</div>
+              <div class="rank-manager">${mgr.display_name}</div>
+            </div>
+            <div class="rank-score">$${mgr.faab_balance?.toLocaleString() || '—'}</div>
+          </div>
+          ${r.blurb ? `<div class="rank-blurb">${r.blurb}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ============================================
+// STANDINGS (pure W/L from Sleeper)
+// ============================================
+async function renderStandings() {
+  const container = document.getElementById('rankings-container');
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">Loading standings from Sleeper...</div>';
+
+  try {
+    const rosters = await fetchSleeperRosters();
+    const standings = allManagers.map(mgr => {
+      const roster = rosters.find(r => r.owner_id === mgr.sleeper_user_id);
+      return {
+        manager: mgr,
+        wins: roster?.settings?.wins || 0,
+        losses: roster?.settings?.losses || 0,
+        ties: roster?.settings?.ties || 0,
+        fpts: roster?.settings?.fpts || 0,
+        fpts_decimal: roster?.settings?.fpts_decimal || 0,
+        totalPoints: (roster?.settings?.fpts || 0) + (roster?.settings?.fpts_decimal || 0) / 100
+      };
+    }).sort((a, b) => {
+      if (b.wins !== a.wins) return b.wins - a.wins;
+      return b.totalPoints - a.totalPoints;
+    });
+
+    container.innerHTML = `
+      <div style="margin-bottom:20px;">
+        <div style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:4px;">League Standings</div>
+        <div style="font-size:0.75rem; color:var(--text-muted);">The cold, hard truth. Win-loss record from Sleeper, tiebreaker by points scored.</div>
+      </div>
+    ` + standings.map((s, i) => `
+      <div class="ranking-entry ${i < 3 ? 'top-3' : ''}">
+        <div class="rank-badge">
+          <div class="rank-number">${i + 1}</div>
+          <span class="rank-movement same">${s.wins}-${s.losses}${s.ties ? '-' + s.ties : ''}</span>
+        </div>
+        <div class="rank-details">
+          <div class="rank-top-row">
+            <div>
+              <div class="rank-team-name">${s.manager.team_name}</div>
+              <div class="rank-manager">${s.manager.display_name}</div>
+            </div>
+            <div class="rank-score">${s.totalPoints.toFixed(1)} PF</div>
+          </div>
+          <div class="rank-stats">
+            <div class="rank-stat"><span class="rank-stat-label">Record</span> <span class="rank-stat-value">${s.wins}-${s.losses}</span></div>
+            <div class="rank-stat"><span class="rank-stat-label">PF</span> <span class="rank-stat-value">${s.totalPoints.toFixed(1)}</span></div>
+            <div class="rank-stat"><span class="rank-stat-label">FAAB</span> <span class="rank-stat-value">$${s.manager.faab_balance?.toLocaleString() || '—'}</span></div>
+          </div>
+        </div>
+      </div>`).join('');
+  } catch (e) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--accent-red);">Error loading standings: ' + e.message + '</div>';
+  }
+}
+
+// ============================================
+// SUPERLATIVES
+// ============================================
 function renderSuperlatives(scores) {
   const container = document.getElementById('superlatives-container');
   if (!scores || scores.length === 0) return;
@@ -595,41 +919,141 @@ function renderSuperlatives(scores) {
   const biggestRoster = [...scores].sort((a, b) => b.stats.rosterSize - a.stats.rosterSize)[0];
 
   container.innerHTML = `
-    <div class="top-perf-row">
-      <div>
-        <div class="top-perf-label">Top Power Score</div>
-        <div>${scores[0]?.manager.team_name || '—'}</div>
-      </div>
-      <div class="top-perf-value">${scores[0]?.powerScore || '—'} PWR</div>
-    </div>
-    <div class="top-perf-row">
-      <div>
-        <div class="top-perf-label">Highest Scorer</div>
-        <div>${topScorer?.manager.team_name || '—'}</div>
-      </div>
-      <div class="top-perf-value">${topScorer?.stats.totalPoints || '—'} pts</div>
-    </div>
-    <div class="top-perf-row">
-      <div>
-        <div class="top-perf-label">FAAB King</div>
-        <div>${mostFaab?.manager.team_name || '—'}</div>
-      </div>
-      <div class="top-perf-value">$${mostFaab?.stats.faabRemaining || '—'}</div>
-    </div>
-    <div class="top-perf-row">
-      <div>
-        <div class="top-perf-label">Best Record</div>
-        <div>${bestRecord?.manager.team_name || '—'}</div>
-      </div>
-      <div class="top-perf-value">${bestRecord?.stats.wins}-${bestRecord?.stats.losses}</div>
-    </div>
-    <div class="top-perf-row">
-      <div>
-        <div class="top-perf-label">Deepest Bench</div>
-        <div>${biggestRoster?.manager.team_name || '—'}</div>
-      </div>
-      <div class="top-perf-value">${biggestRoster?.stats.rosterSize} players</div>
-    </div>`;
+    <div class="top-perf-row"><div><div class="top-perf-label">Top Power Score</div><div>${scores[0]?.manager.team_name || '—'}</div></div><div class="top-perf-value">${scores[0]?.powerScore || '—'} PWR</div></div>
+    <div class="top-perf-row"><div><div class="top-perf-label">Highest Scorer</div><div>${topScorer?.manager.team_name || '—'}</div></div><div class="top-perf-value">${topScorer?.stats.totalPoints || '—'} pts</div></div>
+    <div class="top-perf-row"><div><div class="top-perf-label">FAAB King</div><div>${mostFaab?.manager.team_name || '—'}</div></div><div class="top-perf-value">$${mostFaab?.stats.faabRemaining || '—'}</div></div>
+    <div class="top-perf-row"><div><div class="top-perf-label">Best Record</div><div>${bestRecord?.manager.team_name || '—'}</div></div><div class="top-perf-value">${bestRecord?.stats.wins}-${bestRecord?.stats.losses}</div></div>
+    <div class="top-perf-row"><div><div class="top-perf-label">Deepest Bench</div><div>${biggestRoster?.manager.team_name || '—'}</div></div><div class="top-perf-value">${biggestRoster?.stats.rosterSize} players</div></div>`;
+}
+
+// ============================================
+// VOTERS SIDEBAR
+// ============================================
+function renderVotersSidebar() {
+  const container = document.getElementById('voters-container');
+  const latestVotes = getLatestVotesPerManager();
+  const votedIds = new Set(latestVotes.map(v => v.manager_id));
+  const claimedManagers = allManagers.filter(m => m.auth_id);
+
+  container.innerHTML = claimedManagers.map(m => `
+    <div class="voter-row">
+      <span>${m.display_name}</span>
+      <span class="voter-status ${votedIds.has(m.id) ? 'voted' : 'pending'}">${votedIds.has(m.id) ? 'VOTED' : 'PENDING'}</span>
+    </div>`).join('') || '<div class="voter-row"><span style="color:var(--text-muted);font-style:italic;font-size:0.82rem;">No managers claimed yet.</span></div>';
+}
+
+// ============================================
+// VOTE UI: Drag-and-drop / Arrow-based reorder
+// ============================================
+function initVoteUI() {
+  if (!currentManager) return;
+
+  // Check if user already has a vote — use that order, otherwise use default (FAAB order)
+  const myVote = managerVotes.find(v => v.manager_id === currentManager.id);
+  if (myVote) {
+    voteOrder = myVote.rankings;
+    document.getElementById('vote-subtitle').textContent = 'You\'ve already voted! Reorder and resubmit to update your ballot.';
+  } else {
+    voteOrder = allManagers.map(m => m.id);
+  }
+
+  renderVoteList();
+}
+
+function renderVoteList() {
+  const list = document.getElementById('vote-list');
+  list.innerHTML = voteOrder.map((mgrId, i) => {
+    const mgr = getManager(mgrId);
+    return `
+      <div class="vote-item" draggable="true" data-idx="${i}" data-mgr-id="${mgrId}"
+        ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)" ondragend="dragEnd(event)">
+        <span class="vote-rank">${i + 1}</span>
+        <div style="flex:1;">
+          <div class="vote-team">${mgr.team_name}</div>
+          <div class="vote-mgr">${mgr.display_name}</div>
+        </div>
+        <div class="vote-arrows">
+          <button class="vote-arrow" onclick="moveItem(${i}, -1)" ${i === 0 ? 'disabled style="opacity:0.3;"' : ''}>&#9650;</button>
+          <button class="vote-arrow" onclick="moveItem(${i}, 1)" ${i === voteOrder.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>&#9660;</button>
+        </div>
+        <span class="vote-grip">&#9776;</span>
+      </div>`;
+  }).join('');
+}
+
+let dragIdx = null;
+
+function dragStart(e) {
+  dragIdx = parseInt(e.target.closest('.vote-item').dataset.idx);
+  e.target.closest('.vote-item').classList.add('dragging');
+}
+
+function dragOver(e) {
+  e.preventDefault();
+  const target = e.target.closest('.vote-item');
+  if (target) {
+    document.querySelectorAll('.vote-item').forEach(el => el.classList.remove('drag-over'));
+    target.classList.add('drag-over');
+  }
+}
+
+function drop(e) {
+  e.preventDefault();
+  const target = e.target.closest('.vote-item');
+  if (!target) return;
+  const dropIdx = parseInt(target.dataset.idx);
+  if (dragIdx === null || dragIdx === dropIdx) return;
+
+  // Reorder
+  const item = voteOrder.splice(dragIdx, 1)[0];
+  voteOrder.splice(dropIdx, 0, item);
+  renderVoteList();
+}
+
+function dragEnd(e) {
+  document.querySelectorAll('.vote-item').forEach(el => {
+    el.classList.remove('dragging');
+    el.classList.remove('drag-over');
+  });
+  dragIdx = null;
+}
+
+function moveItem(idx, direction) {
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= voteOrder.length) return;
+  const item = voteOrder.splice(idx, 1)[0];
+  voteOrder.splice(newIdx, 0, item);
+  renderVoteList();
+}
+
+async function submitVote() {
+  if (!currentManager) return;
+  const btn = document.getElementById('vote-submit-btn');
+  const msg = document.getElementById('vote-msg');
+
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  const { error } = await sb.rpc('submit_ranking_vote', {
+    p_manager_id: currentManager.id,
+    p_rankings: voteOrder
+  });
+
+  if (error) {
+    msg.textContent = 'Error: ' + error.message;
+    msg.style.color = 'var(--accent-red)';
+    btn.disabled = false;
+    btn.textContent = 'Submit My Rankings';
+  } else {
+    msg.textContent = 'Your rankings have been submitted!';
+    msg.style.color = 'var(--accent-green)';
+    btn.textContent = 'Update My Rankings';
+    btn.disabled = false;
+
+    await loadManagerVotes();
+    renderManagersPoll();
+    renderVotersSidebar();
+  }
 }
 
 // ============================================
@@ -648,12 +1072,8 @@ async function generateAlgoRankings() {
 
   try {
     const scores = await calculatePowerScores();
-
-    // Get previous rankings for movement
     const prevWeekLabels = [...new Set(rankings.map(r => r.week_label))];
-    const prevRankings = prevWeekLabels.length > 0
-      ? rankings.filter(r => r.week_label === prevWeekLabels[0])
-      : [];
+    const prevRankings = prevWeekLabels.length > 0 ? rankings.filter(r => r.week_label === prevWeekLabels[0]) : [];
 
     container.innerHTML = scores.map((s, i) => {
       const prevRank = prevRankings.find(r => r.manager_id === s.manager.id);
@@ -664,7 +1084,7 @@ async function generateAlgoRankings() {
             <div class="rank-editor-name">${s.manager.team_name}</div>
             <div class="rank-editor-manager">${s.manager.display_name} &middot; ${s.powerScore} PWR${prevRank ? ' &middot; prev #' + prevRank.rank : ''}</div>
           </div>
-          <textarea class="rank-blurb-input" placeholder="Commissioner's blurb (optional)">${''}</textarea>
+          <textarea class="rank-blurb-input" placeholder="Commissioner's blurb (optional)"></textarea>
         </div>`;
     }).join('');
   } catch (e) {
@@ -675,17 +1095,13 @@ async function generateAlgoRankings() {
 async function publishRankings() {
   const label = document.getElementById('rankings-label-input').value.trim();
   const msg = document.getElementById('rankings-publish-msg');
-
   if (!label) { msg.textContent = 'Enter a label (e.g. "Post-Auction")'; msg.className = 'commish-msg error'; return; }
 
   const rows = document.querySelectorAll('.rank-editor-row');
   if (rows.length === 0) { msg.textContent = 'Generate rankings first'; msg.className = 'commish-msg error'; return; }
 
-  // Get previous rankings for movement tracking
   const prevWeekLabels = [...new Set(rankings.map(r => r.week_label))];
-  const prevRankings = prevWeekLabels.length > 0
-    ? rankings.filter(r => r.week_label === prevWeekLabels[0])
-    : [];
+  const prevRankings = prevWeekLabels.length > 0 ? rankings.filter(r => r.week_label === prevWeekLabels[0]) : [];
 
   const entries = [];
   rows.forEach(row => {
@@ -693,33 +1109,17 @@ async function publishRankings() {
     const rank = parseInt(row.querySelector('.rank-input').value);
     const blurb = row.querySelector('.rank-blurb-input').value.trim();
     const prevRank = prevRankings.find(r => r.manager_id === managerId);
-
-    entries.push({
-      manager_id: managerId,
-      week_label: label,
-      season: 2026,
-      rank,
-      prev_rank: prevRank?.rank || null,
-      blurb: blurb || null
-    });
+    entries.push({ manager_id: managerId, week_label: label, season: 2026, rank, prev_rank: prevRank?.rank || null, blurb: blurb || null });
   });
 
-  // Delete existing rankings for this label (upsert)
   await sb.from('power_rankings').delete().eq('week_label', label).eq('season', 2026);
-
   const { error } = await sb.from('power_rankings').insert(entries);
-
   if (error) { msg.textContent = 'Error: ' + error.message; msg.className = 'commish-msg error'; return; }
 
   msg.textContent = 'Rankings published for "' + label + '"!';
   msg.className = 'commish-msg';
-
   await loadRankings();
-  renderRankings();
-}
-
-function changeRankingsWeek() {
-  renderRankings();
+  renderActiveTab();
 }
 
 // ============================================
@@ -732,15 +1132,20 @@ function changeRankingsWeek() {
     await loadManager();
   }
 
-  await Promise.all([loadManagers(), loadRankings(), loadBets()]);
+  await loadAll();
 
-  // Show commissioner panel
-  if (currentManager?.is_commissioner) {
-    document.getElementById('commish-panel').classList.add('visible');
+  if (currentUser) {
+    updateAuthUI(true);
   }
 
-  // Render rankings (published or algorithm)
-  renderRankings();
+  renderActiveTab();
+  renderVotersSidebar();
+
+  // Try to load superlatives from algo
+  try {
+    const scores = await calculatePowerScores();
+    renderSuperlatives(scores);
+  } catch (e) {}
 })();
 </script>
 
